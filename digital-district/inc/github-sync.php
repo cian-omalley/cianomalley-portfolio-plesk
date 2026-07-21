@@ -28,18 +28,157 @@ function dd_github_user() {
  * @return string One of the project statuses.
  */
 function dd_github_status( $repo ) {
+	$name = strtolower( (string) ( $repo['name'] ?? '' ) );
+	$size = isset( $repo['size'] ) ? (int) $repo['size'] : 0;
+
 	if ( ! empty( $repo['archived'] ) ) {
 		return 'Complete';
 	}
-	$pushed = isset( $repo['pushed_at'] ) ? strtotime( $repo['pushed_at'] ) : 0;
-	if ( $pushed && $pushed > ( time() - 60 * DAY_IN_SECONDS ) ) {
-		return 'In Progress';
+	// Template / learning repos are effectively finished artefacts.
+	if ( preg_match( '/(template|starter|skills-)/', $name ) ) {
+		return 'Complete';
 	}
-	// Effectively empty repos read as "Planning".
-	if ( isset( $repo['size'] ) && (int) $repo['size'] === 0 ) {
+	// Near-empty repos are still being planned/scaffolded.
+	if ( $size <= 12 ) {
 		return 'Planning';
 	}
-	return 'In Progress';
+	$pushed = isset( $repo['pushed_at'] ) ? strtotime( $repo['pushed_at'] ) : 0;
+	if ( $pushed && $pushed > ( time() - 120 * DAY_IN_SECONDS ) ) {
+		return 'In Progress';
+	}
+	return 'Planning';
+}
+
+/**
+ * Fetch a repository README and convert it to HTML for the project body.
+ * Server-side; returns '' if unavailable.
+ *
+ * @param string $user Owner.
+ * @param string $repo Repo name.
+ * @return string
+ */
+function dd_github_readme_html( $user, $repo ) {
+	$url  = sprintf( 'https://api.github.com/repos/%s/%s/readme', rawurlencode( $user ), rawurlencode( $repo ) );
+	$resp = wp_remote_get( $url, array(
+		'timeout' => 15,
+		'headers' => array(
+			// The "raw" media type returns the README as markdown text.
+			'Accept'     => 'application/vnd.github.raw+json',
+			'User-Agent' => 'DigitalDistrict-Theme',
+		),
+	) );
+	if ( is_wp_error( $resp ) || 200 !== (int) wp_remote_retrieve_response_code( $resp ) ) {
+		return '';
+	}
+	return dd_md_to_html( wp_remote_retrieve_body( $resp ) );
+}
+
+/**
+ * Minimal, safe Markdown -> HTML converter for README bodies. Handles headings,
+ * fenced/inline code, bold/italic, links, lists, blockquotes and rules. Badge
+ * and inline images are dropped (they usually point off-site). Output is passed
+ * through wp_kses_post, so anything unexpected is stripped.
+ *
+ * @param string $md Markdown source.
+ * @return string Safe HTML.
+ */
+function dd_md_to_html( $md ) {
+	$md    = str_replace( "\r\n", "\n", (string) $md );
+	$lines = explode( "\n", $md );
+	$html  = '';
+	$in_code = false;
+	$in_list = false;
+	$para    = array();
+
+	$flush_para = static function () use ( &$para, &$html ) {
+		if ( $para ) {
+			$html .= '<p>' . implode( ' ', $para ) . '</p>';
+			$para  = array();
+		}
+	};
+	$close_list = static function () use ( &$in_list, &$html ) {
+		if ( $in_list ) {
+			$html   .= '</ul>';
+			$in_list = false;
+		}
+	};
+
+	// Inline formatting applied to already-escaped text.
+	$inline = static function ( $text ) {
+		$text = esc_html( $text );
+		$text = preg_replace( '/!\[[^\]]*\]\([^)]*\)/', '', $text ); // drop images/badges
+		$text = preg_replace_callback( '/\[([^\]]+)\]\(([^)]+)\)/', static function ( $m ) {
+			return '<a href="' . esc_url( html_entity_decode( $m[2] ) ) . '" rel="noopener">' . $m[1] . '</a>';
+		}, $text );
+		$text = preg_replace( '/`([^`]+)`/', '<code>$1</code>', $text );
+		$text = preg_replace( '/\*\*([^*]+)\*\*/', '<strong>$1</strong>', $text );
+		$text = preg_replace( '/(?<!\*)\*(?!\*)([^*]+)\*/', '<em>$1</em>', $text );
+		return $text;
+	};
+
+	foreach ( $lines as $line ) {
+		if ( preg_match( '/^```/', $line ) ) {
+			$flush_para();
+			$close_list();
+			if ( $in_code ) {
+				$html   .= '</code></pre>';
+				$in_code = false;
+			} else {
+				$html   .= '<pre><code>';
+				$in_code = true;
+			}
+			continue;
+		}
+		if ( $in_code ) {
+			$html .= esc_html( $line ) . "\n";
+			continue;
+		}
+
+		$trim = trim( $line );
+
+		if ( '' === $trim ) {
+			$flush_para();
+			$close_list();
+			continue;
+		}
+		if ( preg_match( '/^(#{1,4})\s+(.*)$/', $trim, $m ) ) {
+			$flush_para();
+			$close_list();
+			$level = min( 4, strlen( $m[1] ) + 1 ); // start at h2 inside content
+			$html .= '<h' . $level . '>' . $inline( $m[2] ) . '</h' . $level . '>';
+			continue;
+		}
+		if ( preg_match( '/^(-{3,}|\*{3,})$/', $trim ) ) {
+			$flush_para();
+			$close_list();
+			$html .= '<hr />';
+			continue;
+		}
+		if ( preg_match( '/^[-*]\s+(.*)$/', $trim, $m ) ) {
+			$flush_para();
+			if ( ! $in_list ) {
+				$html   .= '<ul>';
+				$in_list = true;
+			}
+			$html .= '<li>' . $inline( $m[1] ) . '</li>';
+			continue;
+		}
+		if ( preg_match( '/^>\s?(.*)$/', $trim, $m ) ) {
+			$flush_para();
+			$close_list();
+			$html .= '<blockquote><p>' . $inline( $m[1] ) . '</p></blockquote>';
+			continue;
+		}
+
+		$para[] = $inline( $trim );
+	}
+	$flush_para();
+	$close_list();
+	if ( $in_code ) {
+		$html .= '</code></pre>';
+	}
+
+	return wp_kses_post( $html );
 }
 
 /**
@@ -113,8 +252,10 @@ function dd_sync_github() {
 			$data['ID'] = $post_id;
 			$post_id    = wp_update_post( $data, true );
 		} else {
+			// Pull the repo README for a detailed body; fall back to the description.
+			$body                 = dd_github_readme_html( dd_github_user(), $repo['name'] );
 			$data['post_title']   = dd_prettify_repo( $repo['name'] );
-			$data['post_content'] = $desc ? $desc . "\n\n" : '';
+			$data['post_content'] = $body ? $body : ( $desc ? '<p>' . esc_html( $desc ) . '</p>' : '' );
 			$data['menu_order']   = 100 + $i; // GitHub imports sit after curated ones.
 			$post_id              = wp_insert_post( $data, true );
 		}

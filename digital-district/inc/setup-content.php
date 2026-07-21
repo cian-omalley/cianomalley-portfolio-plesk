@@ -26,6 +26,7 @@ function dd_after_switch_theme() {
 
 	dd_seed_guides();
 	dd_seed_reviews();
+	dd_seed_client_templates();
 	dd_build_primary_menu();
 
 	if ( ! wp_next_scheduled( 'dd_github_cron' ) ) {
@@ -112,10 +113,30 @@ function dd_seed_guides() {
 		return;
 	}
 	$guides = array(
-		array( 'Self-Hosting from a Home Server', 'Standing up a portable web stack at home behind a Cloudflare Tunnel.', 'Planned', array( 'Self-Hosting', 'Nginx', 'Docker' ) ),
-		array( 'Building with Hermes Agent', 'Patterns and notes from working with the Hermes Agent tooling.', 'Planned', array( 'AI' ) ),
-		array( 'WordPress Without a Page Builder', 'A fast, maintainable WordPress site using core tooling — like this one.', 'In Progress', array( 'WordPress', 'PHP' ) ),
-		array( 'A JetBrains-Centred Workflow', 'Getting the most out of JetBrains IDEs day to day.', 'Planned', array( 'JetBrains' ) ),
+		array(
+			'Self-Hosting from a Home Server',
+			'Standing up a portable web stack at home behind a Cloudflare Tunnel.',
+			'In Progress', '9 min', array( 'Self-Hosting', 'Nginx', 'Docker' ),
+			"<h2>Why self-host first</h2>\n<p>Owning the stack means no lock-in and a clear migration path. The same stack — Nginx, PHP 8.3, MariaDB, Redis — runs at home now and on a VPS later, so moving is an rsync and a DNS change, not a rebuild.</p>\n<h2>The stack</h2>\n<ul><li><strong>Nginx</strong> as the web server and reverse proxy.</li><li><strong>PHP 8.3</strong> and <strong>MariaDB</strong> for WordPress.</li><li><strong>Redis</strong> for object caching.</li><li><strong>Cloudflare Tunnel</strong> so the residential IP is never exposed.</li></ul>\n<h2>Keeping it portable</h2>\n<p>No panel-only assumptions live in the site itself, backups go off-site, and both domains sit behind Cloudflare — so the eventual VPS move is painless.</p>",
+		),
+		array(
+			'Building with Hermes Agent',
+			'Patterns and notes from working with the Hermes Workspace OS tooling.',
+			'In Progress', '7 min', array( 'AI', 'Python' ),
+			"<h2>What Hermes is</h2>\n<p>An agent-driven workspace operating layer — coordinating tools, memory, and tasks. This guide collects the patterns that have held up while building it.</p>\n<h2>Architecture first</h2>\n<p>Get the core loops right before adding capabilities: a clear task model, durable memory, and a predictable tool interface.</p>",
+		),
+		array(
+			'WordPress Without a Page Builder',
+			'A fast, maintainable WordPress site using core tooling — like this one.',
+			'Published', '11 min', array( 'WordPress', 'PHP' ),
+			"<h2>Hand-coded, not builder-locked</h2>\n<p>This very site is a hand-coded theme: PHP templates, CSS custom properties, and a little vanilla JavaScript. No Oxygen, no Elementor — nothing you cannot move off in an afternoon.</p>\n<h2>Custom post types do the heavy lifting</h2>\n<p>Projects, client work, guides, and reviews are custom post types with their own templates. Content lives in the database and is edited in wp-admin; the theme just renders it.</p>\n<h2>Keep SEO plugins happy</h2>\n<p>Declare <code>title-tag</code> support and never hard-code titles, so Yoast, The SEO Framework, or Rank Math can manage metadata cleanly.</p>",
+		),
+		array(
+			'A JetBrains-Centred Workflow',
+			'Getting the most out of JetBrains IDEs day to day.',
+			'Planned', '6 min', array( 'JetBrains' ),
+			"<h2>One IDE, many languages</h2>\n<p>Notes on running a polyglot workflow — PHP, Python, and TypeScript — from JetBrains tooling, and the shortcuts and inspections that actually save time.</p>",
+		),
 	);
 	foreach ( $guides as $i => $g ) {
 		$id = wp_insert_post( array(
@@ -123,13 +144,40 @@ function dd_seed_guides() {
 			'post_status'  => 'publish',
 			'post_title'   => $g[0],
 			'post_excerpt' => $g[1],
-			'post_content' => $g[1] . "\n\nWrite the full guide in wp-admin.",
+			'post_content' => $g[5],
 			'menu_order'   => $i,
 		) );
 		if ( $id && ! is_wp_error( $id ) ) {
 			update_post_meta( $id, 'dd_status', $g[2] );
-			wp_set_object_terms( $id, $g[3], 'tech' );
+			update_post_meta( $id, 'dd_read', $g[3] );
+			wp_set_object_terms( $id, $g[4], 'tech' );
 		}
+	}
+}
+
+/**
+ * Seed Client Work with a clearly-labelled template case study, so the Work
+ * archive and single layout are populated and ready to duplicate. This is NOT a
+ * real client — it is an example the owner replaces with genuine work.
+ */
+function dd_seed_client_templates() {
+	if ( get_posts( array( 'post_type' => 'client_work', 'posts_per_page' => 1, 'fields' => 'ids', 'post_status' => 'any' ) ) ) {
+		return;
+	}
+	$id = wp_insert_post( array(
+		'post_type'    => 'client_work',
+		'post_status'  => 'publish',
+		'post_title'   => __( 'Example Client Project (template)', 'digital-district' ),
+		'post_excerpt' => __( 'A template case study — duplicate it and replace with a real client project.', 'digital-district' ),
+		'post_content' => "<p><strong>This is a template.</strong> Duplicate it in wp-admin → Client Work and replace the details with a real project you shipped for a client.</p>\n<h2>The brief</h2>\n<p>Summarise what the client needed and the constraints you worked within.</p>\n<h2>What I built</h2>\n<p>Describe the solution — the site or app, the stack, and the notable decisions.</p>\n<h2>Outcome</h2>\n<p>Link to the live site and note the result. Add screenshots via the editor or the featured image.</p>",
+		'menu_order'   => 0,
+	) );
+	if ( $id && ! is_wp_error( $id ) ) {
+		update_post_meta( $id, 'dd_client', __( 'Your Client', 'digital-district' ) );
+		update_post_meta( $id, 'dd_status', 'Complete' );
+		update_post_meta( $id, 'dd_services', __( 'Design, Development, Deployment', 'digital-district' ) );
+		update_post_meta( $id, 'dd_year', gmdate( 'Y' ) );
+		wp_set_object_terms( $id, array( 'WordPress', 'PHP' ), 'tech' );
 	}
 }
 
@@ -141,10 +189,22 @@ function dd_seed_reviews() {
 		return;
 	}
 	$reviews = array(
-		array( 'Oxygen Builder 6', 'Oxygen Builder 6', 'In Progress', '' ),
-		array( 'IntelliJ IDEA Ultimate', 'IntelliJ IDEA Ultimate', 'Planned', '' ),
-		array( 'Antigravity', 'Antigravity', 'Planned', '' ),
-		array( 'Codex', 'Codex', 'Planned', '' ),
+		array(
+			'Oxygen Builder 6', 'Oxygen Builder 6', 'In Progress', '4',
+			"<p>A hands-on review written while building a real portfolio with it — the companion piece to the tutorial series.</p>\n<h2>First impressions</h2>\n<p>Version 6 is a significant step up. The component model is more coherent and the output is cleaner than earlier releases.</p>\n<h2>Where it fits</h2>\n<p>Great for template-owned layouts; the architecture contract still keeps data and logic in a plugin, not in builder code. Full verdict once the build ships.</p>",
+		),
+		array(
+			'IntelliJ IDEA Ultimate', 'IntelliJ IDEA Ultimate', 'Planned', '',
+			"<p>The Ultimate edition for polyglot, full-stack development — planned review covering PHP, Python, and web tooling in one IDE.</p>",
+		),
+		array(
+			'Antigravity', 'Antigravity', 'Planned', '',
+			"<p>First impressions of the Antigravity editor — planned once it has had a proper run in a real project.</p>",
+		),
+		array(
+			'Codex', 'Codex', 'Planned', '',
+			"<p>Using Codex in a real development loop — planned review focusing on where it helps and where it gets in the way.</p>",
+		),
 	);
 	foreach ( $reviews as $i => $r ) {
 		$id = wp_insert_post( array(
@@ -152,12 +212,15 @@ function dd_seed_reviews() {
 			'post_status'  => 'publish',
 			'post_title'   => $r[0],
 			'post_excerpt' => sprintf( __( 'A hands-on review of %s.', 'digital-district' ), $r[0] ),
-			'post_content' => sprintf( __( 'A hands-on review of %s — written from real use.', 'digital-district' ), $r[0] ) . "\n\nWrite the full review in wp-admin.",
+			'post_content' => $r[4],
 			'menu_order'   => $i,
 		) );
 		if ( $id && ! is_wp_error( $id ) ) {
 			update_post_meta( $id, 'dd_subject', $r[1] );
 			update_post_meta( $id, 'dd_status', $r[2] );
+			if ( '' !== $r[3] ) {
+				update_post_meta( $id, 'dd_rating', $r[3] );
+			}
 		}
 	}
 }
