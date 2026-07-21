@@ -50,13 +50,8 @@ add_action( 'after_setup_theme', 'dd_setup' );
 function dd_assets() {
 	$dir = get_template_directory_uri();
 
-	// Self-describing Google Fonts request (swap for self-hosted if preferred).
-	wp_enqueue_style(
-		'dd-fonts',
-		'https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap',
-		array(),
-		null
-	);
+	// Fonts are self-hosted in assets/fonts — no external requests.
+	wp_enqueue_style( 'dd-fonts', $dir . '/assets/css/fonts.css', array(), DD_VERSION );
 
 	wp_enqueue_style( 'dd-tokens', $dir . '/assets/css/tokens.css', array(), DD_VERSION );
 	wp_enqueue_style( 'dd-main', $dir . '/assets/css/main.css', array( 'dd-tokens' ), DD_VERSION );
@@ -69,17 +64,6 @@ function dd_assets() {
 	}
 }
 add_action( 'wp_enqueue_scripts', 'dd_assets' );
-
-/**
- * Preconnect to the font host for a faster first paint.
- */
-function dd_resource_hints( $hints, $relation ) {
-	if ( 'preconnect' === $relation ) {
-		$hints[] = array( 'href' => 'https://fonts.gstatic.com', 'crossorigin' );
-	}
-	return $hints;
-}
-add_filter( 'wp_resource_hints', 'dd_resource_hints', 10, 2 );
 
 /**
  * Add a no-js class so CSS can reveal content when JS is unavailable; main.js

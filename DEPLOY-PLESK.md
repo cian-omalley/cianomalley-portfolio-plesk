@@ -79,5 +79,5 @@ It appears on the homepage and the `/work/` archive with its own case-study page
 | `/work/` or project pages 404 | Re-save **Settings → Permalinks** (Post name). |
 | Contact form doesn't send | Enable the domain mail service in Plesk, or configure SMTP. |
 | GitHub sync failed notice | The server must reach `api.github.com`; click **Sync GitHub** again. |
-| Fonts look plain | The site loads Google Fonts; if blocked, self-host them and update the enqueue in `functions.php`. |
+| Fonts look plain | Ensure `assets/fonts/` uploaded with the theme — fonts are self-hosted, no external calls. |
 | Custom cursor not shown | Expected on touch devices / reduced-motion — the native cursor is used. |

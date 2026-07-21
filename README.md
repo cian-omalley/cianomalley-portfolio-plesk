@@ -36,6 +36,9 @@ custom post types with individual case-study pages.
   a full no-JS baseline.
 - **SEO-ready** — `title-tag` support (so SEO plugins own titles/meta), clean semantic
   markup, feeds, and post thumbnails.
+- **Fully private / offline** — the three fonts (Space Grotesk, Inter, JetBrains Mono) are
+  self-hosted in `assets/fonts/`. No Google Fonts, no CDNs, no third-party requests, no
+  trackers.
 
 ## GitHub project sync
 
