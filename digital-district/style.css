@@ -1,0 +1,26 @@
+/*
+Theme Name: Digital District
+Theme URI: https://cianomalley.works
+Author: Cian O'Malley
+Author URI: https://cianomalley.dev
+Description: A dynamic, animated cyberpunk-brutalist portfolio theme for Cian O'Malley. Hand-coded, no page builder — works with WP Toolkit and any WordPress SEO plugin. Showcases personal projects and client work through custom post types with individual case-study pages.
+Version: 1.0.0
+Requires at least: 6.5
+Tested up to: 6.7
+Requires PHP: 8.1
+License: MIT
+License URI: https://opensource.org/licenses/MIT
+Text Domain: digital-district
+Tags: portfolio, custom-colors, custom-menu, custom-logo, featured-images, translation-ready, full-width-template
+*/
+
+/*
+ * The visual styles live in assets/css/tokens.css and assets/css/main.css,
+ * enqueued from functions.php. This file carries the required theme header and
+ * a minimal safety net only.
+ */
+
+.no-js .reveal {
+  opacity: 1;
+  transform: none;
+}

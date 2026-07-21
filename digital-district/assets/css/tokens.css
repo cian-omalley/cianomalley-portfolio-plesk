@@ -1,0 +1,70 @@
+/*
+ * Design tokens — the single source of truth for colour, type, spacing and
+ * motion. Ported from the project's design system so the WordPress theme stays
+ * visually identical to the concept. Never hard-code a colour outside this file.
+ */
+
+:root {
+  /* Surfaces */
+  --void: #05060a; /* page background — near-black */
+  --surface: #0b0d12; /* panels / cards */
+  --surface-2: #11141c; /* raised panels */
+  --line: #1e222c; /* hairline borders */
+
+  /* Neon (cyberpunk-city references) */
+  --violet: #7c3aed;
+  --violet-soft: #a78bfa;
+  --violet-deep: #3a006f;
+  --magenta: #ff2e88;
+  --cyan: #22d3ee;
+
+  /* "Systematic" brutalist accent (Cyber Brutalism reference) */
+  --acid: #ccff00;
+
+  /* Text */
+  --ink: #f5f7fa;
+  --silver: #c8cdd8;
+  --muted: #7a8290;
+  --warn: #ff315b;
+
+  /* Type */
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --measure: 70ch;
+
+  /* Spacing (4px base) */
+  --s1: 4px;   --s2: 8px;   --s3: 12px;  --s4: 16px;
+  --s5: 24px;  --s6: 32px;  --s7: 48px;  --s8: 64px;
+  --s9: 80px;  --s10: 96px; --s11: 128px; --s12: 160px;
+
+  /* Radius */
+  --r-panel: 2px; /* brutalist: near-square */
+  --r-chip: 999px;
+
+  /* Elevation */
+  --border-hair: 1px solid var(--line);
+  --glow-acid: 0 0 24px rgb(204 255 0 / 0.28);
+  --glow-violet: 0 0 32px rgb(124 58 237 / 0.28);
+  --glow-cyan: 0 0 24px rgb(34 211 238 / 0.25);
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-1: 150ms;
+  --dur-2: 260ms;
+  --dur-3: 500ms;
+
+  /* Z-layers */
+  --z-cursor: 9999;
+  --z-nav: 60;
+  --z-modal: 80;
+  --z-skip: 90;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-1: 0ms;
+    --dur-2: 0ms;
+    --dur-3: 0ms;
+  }
+}

@@ -1,90 +1,83 @@
-# Deploying to Plesk
+# Deploying on Plesk
 
-The site is a **Next.js static export**: `pnpm build` writes plain HTML/CSS/JS to
-`out/`, plus the one PHP script. There is **no Node runtime requirement on the
-server** — Plesk just serves the files.
+This is a WordPress theme, so you run it on a WordPress site managed by Plesk's **WP
+Toolkit**. No build step, no Node runtime.
 
----
+## 1. Get WordPress running
 
-## Option A — Build locally, upload `out/` (simplest, recommended)
+- Plesk → **WordPress** (WP Toolkit) → **Install** on your domain (e.g. `cianomalley.works`),
+  or attach an existing install.
+- Set **Settings → General** site title/tagline (the theme uses these in the hero and
+  footer).
 
-1. **Build** on your machine:
+## 2. Install the theme
 
-   ```bash
-   pnpm install
-   pnpm build
-   ```
+**Option A — upload the zip (simplest):**
 
-   This produces `out/` containing `index.html`, `404.html`, the hashed assets
-   under `_next/`, self-hosted fonts, `favicon.svg`, `robots.txt`, `sitemap.xml`,
-   and `contact.php`.
+1. From this repo: `cd digital-district && zip -r ../digital-district.zip .`
+2. wp-admin → **Appearance → Themes → Add New → Upload Theme** → choose `digital-district.zip`
+   → **Install** → **Activate**.
 
-2. **Upload** the **contents of `out/`** (not the folder itself) into the domain's
-   document root in Plesk:
-   - Plesk → **Websites & Domains** → your domain → **File Manager**
-   - Open `httpdocs/`, remove the default placeholder files, and upload everything
-     from `out/`. (Zip `out/`, upload the zip, then "Extract Files" is fastest.)
+**Option B — WP Toolkit / file manager:**
 
-3. **Set the contact address** — edit `httpdocs/contact.php`:
+- Copy the `digital-district/` folder into `wp-content/themes/` (via WP Toolkit's file
+  manager, SFTP, or Git), then activate it under Appearance → Themes.
 
-   ```php
-   $TO = getenv('CIAN_CONTACT_TO') ?: 'you@example.com'; // <-- your address
-   ```
+On activation the theme:
 
-   Or set it without editing the file, in Plesk → **PHP Settings** / Additional
-   directives:
+- creates the **Home, About, Contact, Blog** pages and sets a static front page,
+- builds the **primary menu** (Home · Work · Projects · Guides · Reviews · Blog · About ·
+  Contact),
+- seeds honest **guide** and **review** topics,
+- **imports every repository** from your GitHub account into **Projects**.
 
-   ```
-   env[CIAN_CONTACT_TO] = you@yourdomain.tld
-   ```
+## 3. Fix permalinks (one time)
 
-4. **Mail** — enable the domain's **Mail Service** (Plesk → Mail) so PHP `mail()`
-   delivers, or configure outgoing SMTP.
+Visit **Settings → Permalinks**, choose **Post name**, and **Save**. This flushes rewrite
+rules so `/work/`, `/projects/`, `/guides/`, `/reviews/`, and the case-study pages resolve.
 
-5. **HTTPS** — enable the free **Let's Encrypt** certificate (Plesk → SSL/TLS
-   Certificates) and turn on "Redirect from HTTP to HTTPS".
+## 4. Contact form email
 
-Because the export uses `trailingSlash: true`, every route is a folder with its
-own `index.html`, so Plesk's Nginx/Apache serves it with no rewrite rules.
+The contact form sends with `wp_mail()`. In Plesk → **Mail**, enable the domain's mail
+service (or configure outgoing SMTP) so messages deliver. Recipient defaults to the site
+admin email; change it with the `dd_contact_recipient` filter if needed.
 
----
+## 5. SEO plugin (from your Plesk subscription)
 
-## Option B — Build on the server with Node (Plesk "Node.js" toolkit)
+Install a free SEO plugin — **The SEO Framework**, **Yoast SEO**, or **Rank Math**. The theme
+declares `title-tag` support and never hard-codes titles/meta, so the plugin fully controls
+titles, descriptions, Open Graph, and sitemaps. The custom post types (`project`,
+`client_work`, `guide`, `review`) are public and indexable, so they appear in the plugin's
+sitemap automatically.
 
-Only needed if you want to `git pull` and build on the box.
+## 6. HTTPS & performance
 
-1. Plesk → **Websites & Domains** → **Node.js** → enable it for the domain.
-2. Upload/clone the repo into the domain (outside `httpdocs`).
-3. In the Node.js panel, install deps and build:
-   - `npm install -g pnpm` (or use `corepack enable`)
-   - `pnpm install`
-   - `pnpm build`
-4. Point the domain's **Document Root** at `.../out`, or copy `out/*` into
-   `httpdocs`.
-5. Set `CIAN_CONTACT_TO` under PHP settings as in Option A.
+- Plesk → **SSL/TLS Certificates** → issue a free **Let's Encrypt** cert and force HTTPS.
+- Optional: a caching plugin from your subscription (e.g. a free page-cache) — the theme is
+  static-friendly and cache-safe.
 
-> The output is static, so you do **not** keep a Node process running — the Node
-> toolkit is only a build convenience.
+## Re-syncing GitHub projects
 
----
+wp-admin → **Projects → Sync GitHub** re-imports your repositories any time; it also refreshes
+daily via cron. Titles and write-ups you edit by hand are preserved. To import from a
+different account, add to a small mu-plugin or the theme:
 
-## Updating the site later
+```php
+add_filter( 'dd_github_user', fn() => 'your-github-username' );
+```
 
-- Change content in `src/data/site.ts` (or any component in `src/components/`).
-- `pnpm build`.
-- Re-upload `out/` (Option A) or re-run the build (Option B).
+## Adding client work
 
-## Custom domain
-
-Set `metadataBase` / `site` URLs by editing `identity.domains.primary` in
-`src/data/site.ts` (used for canonical URLs, Open Graph, and JSON-LD), then
-rebuild.
+wp-admin → **Client Work → Add New**: title, featured image, the write-up in the editor, an
+excerpt for the card, and the **Details** box (client, status, services, year, live URL).
+It appears on the homepage and the `/work/` archive with its own case-study page.
 
 ## Troubleshooting
 
-| Symptom                               | Fix                                                                                                                |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Contact form shows "relay is offline" | Domain mail service disabled or `mail()` blocked — enable Plesk Mail or wire SMTP.                                 |
-| Fonts look like system defaults       | The `_next/` folder wasn't uploaded — upload the **whole** `out/`.                                                 |
-| 3D hero not showing                   | Expected with no WebGL — the CSS grid backdrop is the fallback.                                                    |
-| Assets 404 under a subpath            | The export assumes the site root. Serve it at the domain root, or set `basePath` in `next.config.mjs` and rebuild. |
+| Symptom | Fix |
+| --- | --- |
+| `/work/` or project pages 404 | Re-save **Settings → Permalinks** (Post name). |
+| Contact form doesn't send | Enable the domain mail service in Plesk, or configure SMTP. |
+| GitHub sync failed notice | The server must reach `api.github.com`; click **Sync GitHub** again. |
+| Fonts look plain | The site loads Google Fonts; if blocked, self-host them and update the enqueue in `functions.php`. |
+| Custom cursor not shown | Expected on touch devices / reduced-motion — the native cursor is used. |

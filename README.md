@@ -1,78 +1,85 @@
-# Cian O'Malley — Portfolio (Plesk / no-builder edition)
+# Cian O'Malley — Portfolio (WordPress theme for Plesk)
 
-A dynamic, animated **cyberpunk-brutalist** developer portfolio — "The Digital
-District". Built with free and open-source tools and **no page builder** (no
-Oxygen, no WordPress), then **statically exported** so it drops straight onto
-**Plesk** hosting.
+**Digital District** — a dynamic, animated cyberpunk-brutalist portfolio, built as a
+hand-coded **WordPress theme** with **no page builder**. It runs on WordPress so it works
+with **Plesk's WP Toolkit** and any free WordPress **SEO plugin** (Yoast, The SEO
+Framework, Rank Math), and it showcases **client work** and **personal projects** through
+custom post types with individual case-study pages.
 
-> This repository is a **separate fork**. The original WordPress/Oxygen build
-> lives in `cian-omalley/cianomalley-portfolio` and is untouched.
+> This repository is a **separate fork**. The original WordPress/Oxygen build lives in
+> `cian-omalley/cianomalley-portfolio` and is untouched. The theme lives in
+> [`digital-district/`](digital-district/).
 
-## Stack — 100% free & open source
+## Why WordPress (no builder)
 
-| Concern             | Tool                                                      | License    |
-| ------------------- | --------------------------------------------------------- | ---------- |
-| Framework / router  | [Next.js](https://nextjs.org) (App Router, static export) | MIT        |
-| UI library          | [React 19](https://react.dev)                             | MIT        |
-| Language            | TypeScript (strict)                                       | Apache-2.0 |
-| Design system       | [Tailwind CSS](https://tailwindcss.com)                   | MIT        |
-| UI animation        | [Framer Motion](https://www.framer.com/motion/)           | MIT        |
-| Animated 3D hero    | [Three.js](https://threejs.org)                           | MIT        |
-| Fonts (self-hosted) | Space Grotesk · Inter · JetBrains Mono (via `next/font`)  | OFL/MIT    |
-| Contact backend     | Plain PHP (`public/contact.php`)                          | —          |
+- Manage everything in `wp-admin`; install SEO/caching/security extensions from your Plesk
+  subscription; update and back up through **WP Toolkit**.
+- No Oxygen, no Elementor, no proprietary builder — just PHP templates, CSS, and vanilla JS.
 
-No proprietary builder, no SaaS form service, no external font/CDN calls, no trackers.
+## What it does
 
-## Design
+- **Client Work** and **Projects** are separate custom post types, each with an archive and
+  an individual **case-study page** (`single-*.php`). Titles are clickable and **light up +
+  animate** on hover.
+- **Guides**, **Reviews**, and the native **Blog** each have archive + single templates.
+  Reviews support a star rating; guides support a read-time.
+- **Every item shows a status** — Projects: In Progress / Planning / Complete / Prototype /
+  Research / Live; Client Work: Live / In Progress / Complete / Prototype; Guides:
+  Published / In Progress / Planned; Reviews: a verdict + rating.
+- **All your GitHub repositories import automatically** as Projects (see below), with a
+  status derived from each repo, and a one-click re-sync.
+- **Fluid, dynamic animations** — a custom cursor (dot + trailing ring that reacts to
+  interactive elements), scroll reveals, count-up stats, magnetic buttons, an animated neon
+  skyline canvas hero, and an `Esc`-accessible overlay menu. All respect
+  `prefers-reduced-motion` and disable on touch.
+- **Accessible** — semantic landmarks, skip link, focus rings, keyboard-operable menu, and
+  a full no-JS baseline.
+- **SEO-ready** — `title-tag` support (so SEO plugins own titles/meta), clean semantic
+  markup, feeds, and post thumbnails.
 
-Interpreted from a reference board fusing three directions: **neon cyberpunk
-cities**, **Cyber Brutalism** (mono type, acid-lime HUD, coordinates, system
-status), and **dark personal-portfolio** layouts (stat counters, focus bars,
-selected-work grid). The result: near-black canvas, electric-violet/magenta neon,
-an acid-lime "systematic" accent, and an animated isometric neon city in the hero.
+## GitHub project sync
 
-## What's in the box
+On activation the theme imports every public repository from your account
+(`cian-omalley`, filterable via the `dd_github_user` filter) into **Projects**, mapping:
 
-- **Animated Three.js isometric neon city** in the hero — lazy, client-only,
-  pauses off-screen, honours `prefers-reduced-motion`, and degrades to a CSS grid
-  backdrop when WebGL is unavailable.
-- **Framer Motion throughout** — scroll reveals, hover transforms, an infinite
-  stack marquee, count-up stats, and `scaleX` focus bars (transform-only, no
-  layout reflow).
-- **Single-page portfolio** — Hero, stack marquee, stats, Selected Work, Core
-  Principles, Signal/Focus, Build Log (+ guides/reviews), Contact — plus a themed
-  404 and a keyboard-first command menu (opens with `Esc`, focus-trapped).
-- **Accessibility** — semantic landmarks, skip link, visible focus rings,
-  reduced-motion support, descriptive labels.
-- **Design tokens centralised** in `tailwind.config.ts`; components never use raw
-  hex (per `CLAUDE.md`).
-- **Working PHP contact handler** with honeypot, validation, and mail-header
-  hardening.
-- **SEO** — metadata/Open Graph, `Person`/`WebSite` JSON-LD, `robots.txt`,
-  `sitemap.xml`.
+| Repo signal | Becomes |
+| --- | --- |
+| name → title, description → excerpt | Project title & summary |
+| `html_url` / `homepage` | Repo & live links |
+| `language` + topics | Technologies (`tech` taxonomy) |
+| archived / recent push / empty | Status (Complete / In Progress / Planning) |
 
-All content is drawn from the project's own discovery record — **no invented
-biography, employers, degrees, or skill percentages**; every project carries an
-honest status.
+Re-sync any time from **wp-admin → Projects → Sync GitHub**; it also refreshes daily via
+cron and **preserves** any titles/write-ups you edit by hand.
+
+## Install
+
+1. **Zip the theme:** from the repo, `cd digital-district && zip -r ../digital-district.zip .`
+2. **Upload:** wp-admin → Appearance → Themes → Add New → Upload Theme → choose the zip →
+   **Activate** (or install with WP Toolkit / drop the `digital-district` folder into
+   `wp-content/themes/`).
+3. On activation the theme creates the Home/About/Contact/Blog pages, a primary menu (Home,
+   Work, Projects, Guides, Reviews, Blog, About, Contact), seeds honest guide/review topics,
+   and imports your GitHub repos.
+4. Set **Settings → Reading → Permalinks** to "Post name" (visit Settings → Permalinks and
+   Save once) so the custom post type URLs resolve.
+
+## Deploy on Plesk
+
+See **[DEPLOY-PLESK.md](DEPLOY-PLESK.md)** for the full walkthrough (WP Toolkit install,
+mail for the contact form, SEO plugin, HTTPS).
 
 ## Develop
 
 ```bash
-pnpm install
-pnpm dev         # http://localhost:3000
-pnpm typecheck   # tsc --noEmit
-pnpm lint        # next lint
-pnpm format      # prettier --write .
-pnpm build       # static export -> ./out  (+ contact.php)
+# lint every PHP file
+find digital-district -name '*.php' -print0 | xargs -0 -n1 php -l
+# check the JS
+node --check digital-district/assets/js/main.js
 ```
 
-Edit `src/data/site.ts` to change any content — it is the single content source.
-
-## Deploy to Plesk
-
-See **[DEPLOY-PLESK.md](DEPLOY-PLESK.md)**. In short: `pnpm build`, upload the
-contents of `out/` to the domain's `httpdocs`, and set your address in
-`contact.php` (or the `CIAN_CONTACT_TO` env var).
+Content model lives in `inc/` (post types, meta boxes, GitHub sync, setup); design tokens in
+`assets/css/tokens.css`; interactions in `assets/js/main.js`.
 
 ## License
 
