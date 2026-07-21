@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { identity, focus, stack } from '../data/site.js';
+---
+<Base active="about" title="Identity Chamber — Cian O'Malley" description="Focus areas, stack, and how Cian O'Malley works.">
+  <PageHeader
+    eyebrow="Identity Chamber"
+    title="About"
+    lede={identity.positioning}
+  />
+
+  <section aria-label="Focus areas">
+    <div class="container">
+      <div class="section-head">
+        <h2 data-reveal>What I focus on</h2>
+      </div>
+      <div class="grid grid--2">
+        {focus.map((f) => (
+          <div class="fcard panel" data-reveal>
+            <h3>{f.title}</h3>
+            <p>{f.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Stack">
+    <div class="container">
+      <div class="section-head">
+        <h2 data-reveal>Stack</h2>
+        <p class="lede" data-reveal>The tools behind the builds — the same portable stack self-hosted at home and, later, on a VPS.</p>
+      </div>
+      <ul class="stacklist" data-reveal>
+        {stack.map((t) => <li class="chip">{t}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section aria-label="Note">
+    <div class="container">
+      <div class="note panel" data-reveal>
+        <p class="mono note__k">// note</p>
+        <p>
+          This About page carries focus and stack only. A full timeline of roles and
+          milestones is intentionally left for {identity.name} to supply — nothing here is
+          fabricated.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .fcard { padding: var(--space-5); }
+  .fcard h3 { margin-bottom: var(--space-2); }
+  .fcard p { color: var(--text-muted); margin: 0; }
+  .stacklist { display: flex; flex-wrap: wrap; gap: var(--space-2); list-style: none; padding: 0; margin: 0; }
+  .note { padding: var(--space-6); max-width: var(--measure-reading); }
+  .note__k { color: var(--cyan-signal); margin-bottom: var(--space-2); font-size: 0.8rem; }
+  .note p:last-child { color: var(--silver-moon); margin: 0; }
+</style>

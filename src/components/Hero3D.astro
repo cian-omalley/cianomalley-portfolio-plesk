@@ -1,0 +1,110 @@
+---
+// The Digital District hero. A canvas the Three.js scene mounts into, plus a
+// CSS fallback that shows when WebGL is unavailable or JS is off. Text is HTML
+// overlaid on the scene — never rendered inside WebGL (concept, rejected list).
+import { identity, stack } from '../data/site.js';
+---
+<section class="hero" aria-label="Introduction">
+  <div class="hero__scene" aria-hidden="true">
+    <canvas id="district-canvas" class="hero__canvas"></canvas>
+    <div class="hero__fallback"></div>
+    <div class="hero__scanline"></div>
+  </div>
+
+  <div class="container hero__overlay">
+    <p class="eyebrow">The Digital District</p>
+    <h1 class="hero__title">
+      {identity.name}
+      <span class="hero__role">{identity.role}, {identity.location}</span>
+    </h1>
+    <p class="lede hero__lede">{identity.positioning}</p>
+
+    <div class="hero__cta">
+      <a class="btn btn--primary" href="/projects">Enter the Project Sector</a>
+      <a class="btn btn--ghost" href="/contact">Communications Relay</a>
+    </div>
+
+    <ul class="hero__stack" aria-label="Technology stack">
+      {stack.map((t) => <li class="chip">{t}</li>)}
+    </ul>
+  </div>
+
+  <div class="hero__hint mono" aria-hidden="true">scroll to explore ↓</div>
+</section>
+
+<script>
+  import { initDistrict } from '../scripts/hero-city.js';
+  initDistrict('district-canvas');
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: min(92svh, 900px);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    border-bottom: var(--border-hair);
+  }
+  .hero__scene { position: absolute; inset: 0; z-index: var(--z-canvas); }
+  .hero__canvas { width: 100%; height: 100%; display: block; }
+  /* Fallback gradient cityscape (shown until/unless WebGL takes over). */
+  .hero__fallback {
+    position: absolute; inset: 0; z-index: -1;
+    background:
+      radial-gradient(40vw 40vw at 70% 20%, rgb(124 58 237 / 0.25), transparent 60%),
+      linear-gradient(0deg, rgb(58 0 111 / 0.35), transparent 55%),
+      repeating-linear-gradient(90deg, transparent 0 38px, rgb(200 205 216 / 0.05) 38px 40px),
+      var(--bg-void);
+  }
+  .hero.is-webgl .hero__fallback { opacity: 0; }
+  /* Overlay gradient so text stays legible over the scene. */
+  .hero__overlay {
+    position: relative;
+    z-index: var(--z-overlay);
+    padding-block: var(--space-9);
+  }
+  .hero__overlay::before {
+    content: "";
+    position: absolute;
+    inset: -20vh -50vw;
+    z-index: -1;
+    background: radial-gradient(60% 60% at 30% 50%, rgb(4 8 5 / 0.82), transparent 75%);
+    pointer-events: none;
+  }
+  .hero__title { margin-bottom: var(--space-4); }
+  .hero__role {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: clamp(0.9rem, 1.6vw, 1.1rem);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: var(--cyan-signal);
+    margin-top: var(--space-3);
+  }
+  .hero__lede { margin-bottom: var(--space-6); }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-6); }
+  .hero__stack {
+    display: flex; flex-wrap: wrap; gap: var(--space-2);
+    list-style: none; margin: 0; padding: 0;
+    max-width: 46rem;
+  }
+  .hero__scanline {
+    position: absolute; left: 0; right: 0; top: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan-signal), transparent);
+    opacity: 0.5;
+    animation: scan 9s linear infinite;
+    pointer-events: none;
+  }
+  .hero__hint {
+    position: absolute; bottom: var(--space-5); left: 50%; transform: translateX(-50%);
+    z-index: var(--z-overlay);
+    font-size: 0.75rem; color: var(--text-muted);
+    animation: bob 2.4s var(--ease-out) infinite;
+  }
+  @keyframes scan { 0% { transform: translateY(0); } 100% { transform: translateY(92svh); } }
+  @keyframes bob { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
+  @media (prefers-reduced-motion: reduce) {
+    .hero__scanline, .hero__hint { animation: none; }
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+import { identity, districts } from '../data/site.js';
+const year = new Date().getFullYear();
+const links = districts.filter((d) => d.id !== 'arrival');
+---
+<footer class="foot">
+  <div class="container foot__inner">
+    <div class="foot__brand">
+      <p class="foot__name">{identity.name}</p>
+      <p class="foot__role mono">{identity.role} — {identity.location}</p>
+    </div>
+    <nav class="foot__nav" aria-label="Footer">
+      {links.map((l) => <a href={l.href}>{l.short}</a>)}
+    </nav>
+    <div class="foot__social">
+      {identity.social.map((s) => <a href={s.href} rel="noopener">{s.label}</a>)}
+    </div>
+  </div>
+  <div class="container foot__legal mono">
+    <span>© {year} {identity.name}</span>
+    <span>Built with Astro + Three.js — no builder, open source, Plesk-hosted.</span>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    border-top: var(--border-hair);
+    margin-top: var(--space-11);
+    padding-block: var(--space-8) var(--space-6);
+    background: linear-gradient(transparent, rgb(11 16 16 / 0.4));
+  }
+  .foot__inner {
+    display: grid;
+    gap: var(--space-6);
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 720px) {
+    .foot__inner { grid-template-columns: 1.4fr 1fr 1fr; align-items: start; }
+  }
+  .foot__name { font-family: var(--font-display); font-size: 1.1rem; margin: 0; }
+  .foot__role { color: var(--text-muted); font-size: 0.85rem; margin: 4px 0 0; }
+  .foot__nav, .foot__social { display: flex; flex-direction: column; gap: var(--space-2); }
+  .foot__nav a, .foot__social a { color: var(--silver-moon); font-size: 0.9rem; }
+  .foot__nav a:hover, .foot__social a:hover { color: var(--cyan-signal); }
+  .foot__legal {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3);
+    margin-top: var(--space-7); padding-top: var(--space-5);
+    border-top: var(--border-hair);
+    color: var(--text-muted); font-size: 0.75rem;
+  }
+</style>

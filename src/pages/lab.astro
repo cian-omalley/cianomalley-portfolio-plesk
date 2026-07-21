@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { projects } from '../data/site.js';
+
+// The Experimental Sector surfaces prototype / research work.
+const experiments = projects.filter((p) => ['Prototype', 'Research'].includes(p.status));
+---
+<Base active="lab" title="Experimental Sector — Cian O'Malley" description="Prototypes, research, and experiments — showcased at cianomalley.dev.">
+  <PageHeader
+    eyebrow="Experimental Sector"
+    title="The Lab"
+    lede="Prototype and research work — the kind of thing that lands on cianomalley.dev. Rough edges expected; that's the point."
+  />
+
+  <section aria-label="Experiments">
+    <div class="container grid grid--3">
+      {experiments.map((p) => <ProjectCard project={p} />)}
+    </div>
+  </section>
+
+  <section aria-label="Showcase domain">
+    <div class="container">
+      <div class="note panel" data-reveal>
+        <p class="mono note__k">// showcase</p>
+        <p>Small demos and experiments live at <a href="https://cianomalley.dev" rel="noopener">cianomalley.dev</a>, separate from the main portfolio.</p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .note { padding: var(--space-6); max-width: var(--measure-reading); }
+  .note__k { color: var(--cyan-signal); margin-bottom: var(--space-2); font-size: 0.8rem; }
+  .note p:last-child { color: var(--silver-moon); margin: 0; }
+</style>

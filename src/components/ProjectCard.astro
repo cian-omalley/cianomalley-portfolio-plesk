@@ -1,0 +1,38 @@
+---
+const { project, featured = false } = Astro.props;
+---
+<article class:list={["pcard panel", { "pcard--featured": featured }]} data-reveal>
+  <div class="pcard__top">
+    <span class:list={["chip status", project.statusClass]}>{project.status}</span>
+    <div class="pcard__tags">
+      {project.tags.map((t) => <span class="pcard__tag mono">{t}</span>)}
+    </div>
+  </div>
+  <h3 class="pcard__title">{project.title}</h3>
+  <p class="pcard__tagline">{project.tagline}</p>
+  <p class="pcard__summary">{project.summary}</p>
+</article>
+
+<style>
+  .pcard {
+    padding: var(--space-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    transition: transform var(--dur-panel) var(--ease-out),
+                border-color var(--dur-panel) var(--ease-out),
+                box-shadow var(--dur-panel) var(--ease-out);
+  }
+  .pcard:hover {
+    transform: translateY(-4px);
+    border-color: rgb(124 58 237 / 0.5);
+    box-shadow: var(--glow-violet);
+  }
+  .pcard--featured { border-color: rgb(124 58 237 / 0.4); }
+  .pcard__top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; }
+  .pcard__tags { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  .pcard__tag { font-size: 0.7rem; color: var(--text-muted); }
+  .pcard__title { margin: 0; }
+  .pcard__tagline { color: var(--silver-moon); margin: 0; }
+  .pcard__summary { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+</style>

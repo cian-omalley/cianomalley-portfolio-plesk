@@ -1,0 +1,58 @@
+/*
+ * Design tokens — single source of truth, ported verbatim from the original
+ * cian-portfolio-core plugin (docs/plan/06 §18) so the Plesk build stays
+ * visually identical to the WordPress/Oxygen concept. Never hard-code a color
+ * that isn't a token here.
+ */
+
+:root {
+  /* Color */
+  --bg-void: #040805;                     /* main background */
+  --surface-dark: #0B1010;                /* dark surface / panels */
+  --surface-glass: rgb(11 16 16 / 0.72);  /* dark glass panels (+ backdrop-blur) */
+  --purple-deep: #3A006F;                 /* ambient light, large fields */
+  --violet-electric: #7C3AED;             /* primary accent, key lights */
+  --violet-300: #A78BFA;                  /* link text on dark (contrast-safe) */
+  --silver-moon: #C8CDD8;                 /* secondary text, rim light, borders */
+  --white-soft: #F5F7FA;                  /* primary text */
+  --text-muted: #89919E;                  /* muted text, metadata */
+  --cyan-signal: #22D3EE;                 /* interactive/system indicators ONLY */
+  --red-warning: #FF315B;                 /* warnings / errors ONLY */
+
+  /* Typography */
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --measure-reading: 70ch;
+
+  /* Spacing (4px base) */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px;  --space-6: 32px;  --space-7: 48px;  --space-8: 64px;
+  --space-9: 80px;  --space-10: 96px; --space-11: 128px; --space-12: 160px;
+
+  /* Radius */
+  --radius-panel: 12px;
+  --radius-control: 8px;
+  --radius-chip: 999px;
+
+  /* Elevation (subtle glow, never bloom) */
+  --border-hair: 1px solid rgb(200 205 216 / 0.14);
+  --glow-violet: 0 0 24px rgb(124 58 237 / 0.15);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-micro: 150ms;
+  --dur-panel: 240ms;
+
+  /* Z-layers */
+  --z-canvas: 0;
+  --z-overlay: 10;
+  --z-panel: 20;
+  --z-menu: 30;
+  --z-modal: 40;
+  --z-skip: 50;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-micro: 0ms; --dur-panel: 0ms; }
+}

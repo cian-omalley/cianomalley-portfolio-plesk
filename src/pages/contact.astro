@@ -1,0 +1,82 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { identity } from '../data/site.js';
+---
+<Base active="contact" title="Communications Relay — Cian O'Malley" description="Open a channel to Cian O'Malley — developer and systems builder in Stuttgart, Germany.">
+  <PageHeader
+    eyebrow="Communications Relay"
+    title="Get in touch"
+    lede="Send a signal. The form posts to a small PHP handler that Plesk serves directly — no third-party form service, no tracking."
+  />
+
+  <section aria-label="Contact form">
+    <div class="container contact">
+      <form class="contact__form panel" action="/contact.php" method="post" novalidate>
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required maxlength="120" />
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required maxlength="180" />
+        </div>
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="6" required maxlength="4000"></textarea>
+        </div>
+        <!-- Honeypot: real users leave this empty; bots often fill it. -->
+        <div class="field field--trap" aria-hidden="true">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+        <div class="contact__actions">
+          <button class="btn btn--primary" type="submit">Transmit</button>
+          <span class="contact__note mono">or email directly below</span>
+        </div>
+      </form>
+
+      <aside class="contact__side">
+        <div class="panel contact__card" data-reveal>
+          <p class="eyebrow">Direct channels</p>
+          <ul class="contact__links">
+            {identity.social.map((s) => (
+              <li><a href={s.href} rel="noopener">{s.label} ↗</a></li>
+            ))}
+          </ul>
+          <p class="contact__loc mono">{identity.location}</p>
+        </div>
+        <p class="contact__fallback mono">
+          No PHP configured yet? The form still validates client-side; wire
+          <code>public/contact.php</code> to your mailbox on Plesk to receive messages.
+        </p>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact { display: grid; gap: var(--space-6); grid-template-columns: 1fr; }
+  @media (min-width: 860px) { .contact { grid-template-columns: 1.5fr 1fr; align-items: start; } }
+  .contact__form { padding: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4); }
+  .field { display: flex; flex-direction: column; gap: var(--space-2); }
+  .field label { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.04em; color: var(--silver-moon); }
+  .field input, .field textarea {
+    background: rgb(4 8 5 / 0.6);
+    border: var(--border-hair);
+    border-radius: var(--radius-control);
+    color: var(--white-soft);
+    font: inherit;
+    padding: var(--space-3);
+    transition: border-color var(--dur-micro) var(--ease-out);
+  }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--cyan-signal); }
+  .field--trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .contact__actions { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+  .contact__note, .contact__fallback { color: var(--text-muted); font-size: 0.78rem; }
+  .contact__side { display: flex; flex-direction: column; gap: var(--space-4); }
+  .contact__card { padding: var(--space-5); }
+  .contact__links { list-style: none; padding: 0; margin: 0 0 var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
+  .contact__loc { color: var(--text-muted); font-size: 0.8rem; }
+  .contact__fallback code { color: var(--violet-300); }
+</style>
