@@ -1,14 +1,29 @@
-# build output
-dist/
 # dependencies
 node_modules/
-# astro
-.astro/
-# logs / env
+.pnp
+.pnp.*
+
+# next.js
+.next/
+out/
+next-env.d.ts
+
+# production build output (Plesk upload target)
+# (kept out of git; regenerate with `pnpm build`)
+
+# misc
 *.log
+.DS_Store
+Thumbs.db
+
+# env
 .env
 .env.*
 !.env.example
-# os
-.DS_Store
-Thumbs.db
+
+# editor
+.vscode/
+.idea/
+
+# typescript incremental build info
+*.tsbuildinfo

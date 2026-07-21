@@ -25,4 +25,4 @@
 
 - **Pre-Planning Stage:** Always outline structural changes and verify component imports in a draft workspace before finalizing code modifications.
 - **Code Readability & Simplicity:** Keep variable names short and semantic (e.g., use `score` instead of `totalCalculatedUserScoreValue`). Avoid overly complex functional chains when a standard loop is more readable.
-- **Inline Comments:** Focus comments exclusively on explaining *why* a responsive breakpoint, performance layout trade-off, or complex animation curve was chosen. Do not write redundant explanations for standard React hooks.
+- **Inline Comments:** Focus comments exclusively on explaining _why_ a responsive breakpoint, performance layout trade-off, or complex animation curve was chosen. Do not write redundant explanations for standard React hooks.

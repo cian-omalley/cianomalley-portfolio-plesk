@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    @apply bg-void font-body text-ink antialiased;
+    /* Faint deep-purple wash + fixed HUD grid behind everything. */
+    background-image:
+      radial-gradient(60vw 60vw at 82% -10%, rgba(58, 0, 111, 0.4), transparent 60%),
+      radial-gradient(48vw 48vw at 4% 108%, rgba(255, 46, 136, 0.1), transparent 60%);
+  }
+
+  ::selection {
+    @apply bg-acid text-void;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-cyan ring-offset-2 ring-offset-void;
+  }
+}
+
+@layer components {
+  /* Monospace HUD label — used for eyebrows, coordinates, section tags. */
+  .hud {
+    @apply font-mono text-xs uppercase tracking-widest text-muted;
+  }
+
+  .panel {
+    @apply border border-line bg-surface/70 backdrop-blur-md;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 font-mono text-sm tracking-wide transition-transform duration-150 will-change-transform;
+  }
+  .btn-primary {
+    @apply bg-acid px-5 py-3 text-void shadow-glow-acid hover:-translate-y-0.5;
+  }
+  .btn-ghost {
+    @apply border border-line px-5 py-3 text-silver hover:-translate-y-0.5 hover:border-cyan hover:text-cyan;
+  }
+}
