@@ -156,28 +156,68 @@ function dd_seed_guides() {
 }
 
 /**
- * Seed Client Work with a clearly-labelled template case study, so the Work
- * archive and single layout are populated and ready to duplicate. This is NOT a
- * real client — it is an example the owner replaces with genuine work.
+ * Seed Client Work with detailed SAMPLE case studies so the Work archive and
+ * single layout are fully populated and ready to duplicate. These are clearly
+ * marked demo projects with fictional clients — each body carries a note to
+ * replace it with a real project. Nothing here is presented as a genuine
+ * engagement.
  */
 function dd_seed_client_templates() {
 	if ( get_posts( array( 'post_type' => 'client_work', 'posts_per_page' => 1, 'fields' => 'ids', 'post_status' => 'any' ) ) ) {
 		return;
 	}
-	$id = wp_insert_post( array(
-		'post_type'    => 'client_work',
-		'post_status'  => 'publish',
-		'post_title'   => __( 'Example Client Project (template)', 'digital-district' ),
-		'post_excerpt' => __( 'A template case study — duplicate it and replace with a real client project.', 'digital-district' ),
-		'post_content' => "<p><strong>This is a template.</strong> Duplicate it in wp-admin → Client Work and replace the details with a real project you shipped for a client.</p>\n<h2>The brief</h2>\n<p>Summarise what the client needed and the constraints you worked within.</p>\n<h2>What I built</h2>\n<p>Describe the solution — the site or app, the stack, and the notable decisions.</p>\n<h2>Outcome</h2>\n<p>Link to the live site and note the result. Add screenshots via the editor or the featured image.</p>",
-		'menu_order'   => 0,
-	) );
-	if ( $id && ! is_wp_error( $id ) ) {
-		update_post_meta( $id, 'dd_client', __( 'Your Client', 'digital-district' ) );
-		update_post_meta( $id, 'dd_status', 'Complete' );
-		update_post_meta( $id, 'dd_services', __( 'Design, Development, Deployment', 'digital-district' ) );
-		update_post_meta( $id, 'dd_year', gmdate( 'Y' ) );
-		wp_set_object_terms( $id, array( 'WordPress', 'PHP' ), 'tech' );
+
+	$note = "\n<hr />\n<p><em>Sample case study — replace with a real project in wp-admin → Client Work.</em></p>";
+
+	$items = array(
+		array(
+			'title'    => 'Aurora Studio — Portfolio & Booking Site',
+			'excerpt'  => 'A fast, bookable portfolio site for a photography studio.',
+			'client'   => 'Aurora Studio (sample)',
+			'status'   => 'Live',
+			'services' => 'Design, WordPress build, Booking integration, SEO',
+			'year'     => '2026',
+			'tech'     => array( 'WordPress', 'PHP', 'JavaScript' ),
+			'body'     => "<h2>The brief</h2>\n<p>A photography studio needed a portfolio that loaded instantly, showed their work at full quality, and let clients request sessions without back-and-forth email.</p>\n<h2>What I built</h2>\n<p>A hand-coded WordPress theme with lazy-loaded galleries, a lightweight booking request flow wired to their mailbox, and structured data so shoots rank in local search. No page builder, so the site stays fast and easy to maintain.</p>\n<ul><li>Sub-second first paint on mobile</li><li>Self-hosted, no third-party booking fees</li><li>Editable galleries and packages in wp-admin</li></ul>\n<h2>Outcome</h2>\n<p>The studio manages everything themselves and books sessions straight from the site.</p>",
+		),
+		array(
+			'title'    => 'Meridian Coffee — E-commerce Storefront',
+			'excerpt'  => 'A subscription-ready storefront for a specialty coffee roaster.',
+			'client'   => 'Meridian Coffee (sample)',
+			'status'   => 'Live',
+			'services' => 'WooCommerce, Subscriptions, Performance, Hosting',
+			'year'     => '2025',
+			'tech'     => array( 'WordPress', 'PHP', 'MariaDB', 'Redis' ),
+			'body'     => "<h2>The brief</h2>\n<p>A roaster wanted to sell bags and recurring subscriptions directly, off the marketplace platforms that were taking a cut of every order.</p>\n<h2>What I built</h2>\n<p>A WooCommerce storefront with a subscription flow, Redis object caching, and a self-hosted stack behind Cloudflare. Product and subscription management stays entirely in the client's hands.</p>\n<ul><li>Recurring subscriptions with pause/skip</li><li>Cached, cart-safe pages for speed under load</li><li>Owned infrastructure — no per-sale platform fees</li></ul>\n<h2>Outcome</h2>\n<p>Direct sales and repeat subscriptions, fully under the roaster's control.</p>",
+		),
+		array(
+			'title'    => 'Northwind Labs — SaaS Marketing Site',
+			'excerpt'  => 'A marketing site and docs hub for a developer-tools startup.',
+			'client'   => 'Northwind Labs (sample)',
+			'status'   => 'In Progress',
+			'services' => 'Design system, Front-end, Docs, Analytics',
+			'year'     => '2026',
+			'tech'     => array( 'TypeScript', 'JavaScript', 'PHP' ),
+			'body'     => "<h2>The brief</h2>\n<p>A developer-tools startup needed a marketing site that felt technical and trustworthy, plus a documentation hub that engineers could actually navigate.</p>\n<h2>What I built</h2>\n<p>A component-driven front end built on a shared design system, an accessible docs section with fast search, and privacy-respecting analytics — no invasive trackers.</p>\n<ul><li>Reusable design-system components</li><li>Keyboard-navigable, searchable docs</li><li>Accessible to WCAG AA</li></ul>\n<h2>Outcome</h2>\n<p>In progress — launching alongside the product's public beta.</p>",
+		),
+	);
+
+	foreach ( $items as $i => $c ) {
+		$id = wp_insert_post( array(
+			'post_type'    => 'client_work',
+			'post_status'  => 'publish',
+			'post_title'   => $c['title'],
+			'post_excerpt' => $c['excerpt'],
+			'post_content' => $c['body'] . $note,
+			'menu_order'   => $i,
+		) );
+		if ( $id && ! is_wp_error( $id ) ) {
+			update_post_meta( $id, 'dd_client', $c['client'] );
+			update_post_meta( $id, 'dd_status', $c['status'] );
+			update_post_meta( $id, 'dd_services', $c['services'] );
+			update_post_meta( $id, 'dd_year', $c['year'] );
+			wp_set_object_terms( $id, $c['tech'], 'tech' );
+		}
 	}
 }
 

@@ -74,10 +74,15 @@ function dd_card( $index = 0 ) {
 	$terms  = get_the_terms( get_the_ID(), 'tech' );
 	?>
 	<article <?php post_class( 'card reveal' ); ?> data-delay="<?php echo esc_attr( ( $index % 3 ) * 80 ); ?>">
-		<?php if ( has_post_thumbnail() ) : ?>
+		<?php
+		$dd_ph = ( $terms && ! is_wp_error( $terms ) ) ? $terms[0]->name : ucfirst( str_replace( '_', ' ', get_post_type() ) );
+		if ( has_post_thumbnail() ) :
+			?>
 			<a class="card__thumb" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true">
 				<?php the_post_thumbnail( 'dd_card', array( 'loading' => 'lazy', 'alt' => '' ) ); ?>
 			</a>
+		<?php else : ?>
+			<a class="card__thumb card__thumb--ph" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true" data-label="<?php echo esc_attr( $dd_ph ); ?>"></a>
 		<?php endif; ?>
 
 		<div class="card__top">
@@ -228,6 +233,8 @@ function dd_single() {
 		<div class="container">
 			<?php if ( has_post_thumbnail() ) : ?>
 				<div class="single-cover reveal"><?php the_post_thumbnail( 'dd_cover', array( 'alt' => esc_attr( get_the_title() ) ) ); ?></div>
+			<?php else : ?>
+				<div class="single-cover single-cover--ph reveal" data-label="<?php echo esc_attr( ucwords( str_replace( '_', ' ', $type ) ) ); ?>" aria-hidden="true"></div>
 			<?php endif; ?>
 
 			<div class="narrow entry-content reveal">

@@ -74,7 +74,26 @@ while ( have_posts() ) :
 	</section>
 
 	<section class="container">
-		<?php dd_section_heading( '03', __( 'Stack', 'digital-district' ), __( 'Tools I build with', 'digital-district' ) ); ?>
+		<?php dd_section_heading( '03', __( 'Services', 'digital-district' ), __( 'How I can help', 'digital-district' ), __( 'Available for client work — websites, apps, and the infrastructure behind them.', 'digital-district' ) ); ?>
+		<div class="grid grid--3">
+			<?php
+			$dd_services = array(
+				array( __( 'Websites & Web Apps', 'digital-district' ), __( 'Fast, accessible, hand-built sites and applications — WordPress or custom, no bloated builders.', 'digital-district' ) ),
+				array( __( 'Self-Hosting & DevOps', 'digital-district' ), __( 'Portable Linux stacks, Cloudflare, backups, and painless migrations you actually own.', 'digital-district' ) ),
+				array( __( 'Design Systems', 'digital-district' ), __( 'Tokens, components, and motion that keep a brand consistent across every surface.', 'digital-district' ) ),
+			);
+			foreach ( $dd_services as $i => $s ) :
+				?>
+				<div class="service reveal" data-delay="<?php echo esc_attr( ( $i % 3 ) * 70 ); ?>">
+					<h3><?php echo esc_html( $s[0] ); ?></h3>
+					<p><?php echo esc_html( $s[1] ); ?></p>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	</section>
+
+	<section class="container">
+		<?php dd_section_heading( '04', __( 'Stack', 'digital-district' ), __( 'Tools I build with', 'digital-district' ) ); ?>
 		<ul class="reveal" style="display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0">
 			<?php foreach ( $dd_stack as $t ) : ?>
 				<li class="chip"><?php echo esc_html( $t ); ?></li>

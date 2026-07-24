@@ -174,7 +174,10 @@ body.has-cursor a, body.has-cursor button { cursor: none; }
 .nav-toggle { display: inline-flex; align-items: center; gap: var(--s2); background: color-mix(in srgb, var(--surface) 60%, transparent); border: var(--border-hair); color: var(--silver); padding: var(--s2) var(--s3); font-family: var(--font-mono); font-size: 0.78rem; cursor: pointer; }
 .nav-toggle:hover { border-color: var(--acid); color: var(--acid); }
 .nav-toggle kbd { border: var(--border-hair); border-radius: 3px; padding: 0 5px; font-size: 0.66rem; color: var(--muted); }
-@media (min-width: 900px) { .nav-menu { display: flex; } .nav-toggle { display: none; } }
+/* Inline nav on wide screens only; tablets and phones use the overlay menu so
+   the eight items never crowd or overflow the bar. */
+@media (min-width: 1024px) { .nav-menu { display: flex; } .nav-toggle { display: none; } }
+@media (min-width: 1024px) and (max-width: 1160px) { .nav-menu { gap: var(--s4); } .nav-menu a { font-size: 0.74rem; } }
 
 /* ---- Command / mobile menu overlay ---- */
 .overlay-menu { position: fixed; inset: 0; z-index: var(--z-modal); display: none; place-items: center; padding: var(--s4); }
@@ -307,3 +310,77 @@ body.has-cursor a, body.has-cursor button { cursor: none; }
 .wp-caption-text, .wp-element-caption { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); margin-top: var(--s2); }
 .screen-reader-text { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .sticky, .bypostauthor { display: block; }
+
+/* ---- Gradient thumbnail placeholder (cards / covers without an image) ---- */
+.card__thumb--ph, .single-cover--ph {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(60% 80% at 25% 20%, rgb(124 58 237 / 0.45), transparent 60%),
+    radial-gradient(70% 90% at 90% 90%, rgb(255 46 136 / 0.30), transparent 60%),
+    linear-gradient(135deg, var(--surface-2), var(--void));
+}
+.card__thumb--ph::after, .single-cover--ph::after {
+  content: attr(data-label);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgb(245 247 250 / 0.55);
+}
+.single-cover--ph { aspect-ratio: 16 / 9; }
+
+/* ---- Services (About / for clients) ---- */
+.service { background: var(--void); padding: var(--s6); display: flex; flex-direction: column; gap: var(--s2); }
+.service h3 { margin: 0; }
+.service p { color: var(--muted); margin: 0; font-size: 0.95rem; }
+
+/* =========================================================================
+   Responsive refinements — tablet (<=1024) and phone (<=640)
+   ========================================================================= */
+
+/* Tablet and down: calmer vertical rhythm, tighter hero. */
+@media (max-width: 1024px) {
+  section { padding-block: var(--s8); }
+  .hero { min-height: 88svh; }
+  .hero__inner { padding-block: var(--s9); }
+  .single-hero { padding-block: var(--s8) var(--s5); }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Phone: single-column everything, smaller pads, no fixed HUD clutter. */
+@media (max-width: 640px) {
+  .container, .narrow { width: min(100% - var(--s5), 1200px); }
+  section { padding-block: var(--s7); }
+
+  .hero { min-height: 82svh; }
+  .hero__inner { padding-block: var(--s8); }
+  .hero__cta { gap: var(--s2); }
+  .hero__cta .btn { flex: 1 1 auto; justify-content: center; }
+
+  h1 { font-size: clamp(2.2rem, 11vw, 3rem); }
+  .section-head { margin-bottom: var(--s6); }
+
+  .grid--2, .grid--3 { grid-template-columns: 1fr; }
+  .stat { padding: var(--s6) var(--s3); }
+  .stat__n { font-size: clamp(2rem, 12vw, 2.6rem); }
+
+  .card { padding: var(--s5); }
+  .card__thumb { margin: calc(var(--s5) * -1) calc(var(--s5) * -1) var(--s2); }
+
+  .single-meta { gap: var(--s4); }
+  .contact-grid { gap: var(--s5); }
+  .post-nav { flex-direction: column; gap: var(--s2); }
+
+  .footer-legal { flex-direction: column; align-items: flex-start; }
+
+  /* The relay CTA panel stacks its button under the copy. */
+  .panel .btn { width: 100%; justify-content: center; }
+}
+
+/* Very small phones: ensure the marquee and chips never force a scroll. */
+@media (max-width: 380px) {
+  .hero__title { word-break: break-word; }
+  .nav .brand span:last-child { font-size: 0.9rem; }
+}
