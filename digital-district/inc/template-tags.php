@@ -351,7 +351,16 @@ function dd_nav_groups() {
 	}
 
 	if ( $about ) {
-		$groups[] = array( 'label' => __( 'About', 'digital-district' ), 'url' => get_permalink( $about ) );
+		$about_group = array( array( 'label' => __( 'About', 'digital-district' ), 'url' => get_permalink( $about ) ) );
+		$breakdown   = get_page_by_path( 'breakdown' );
+		if ( $breakdown ) {
+			$about_group[] = array( 'label' => __( 'Project Breakdown', 'digital-district' ), 'url' => get_permalink( $breakdown ) );
+		}
+		if ( count( $about_group ) > 1 ) {
+			$groups[] = array( 'label' => __( 'About', 'digital-district' ), 'url' => get_permalink( $about ), 'children' => $about_group );
+		} else {
+			$groups[] = array( 'label' => __( 'About', 'digital-district' ), 'url' => get_permalink( $about ) );
+		}
 	}
 	if ( $contact ) {
 		$groups[] = array( 'label' => __( 'Contact', 'digital-district' ), 'url' => get_permalink( $contact ) );

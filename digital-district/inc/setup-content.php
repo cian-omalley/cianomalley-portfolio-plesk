@@ -88,6 +88,17 @@ function dd_create_pages() {
 		) );
 	}
 
+	if ( ! get_page_by_path( 'breakdown' ) ) {
+		wp_insert_post( array(
+			'post_title'    => __( 'Project Breakdown', 'digital-district' ),
+			'post_name'     => 'breakdown',
+			'post_status'   => 'publish',
+			'post_type'     => 'page',
+			'page_template' => 'page-breakdown.php',
+			'post_content'  => '',
+		) );
+	}
+
 	// Blog: a posts page so the native post type has a home in the nav.
 	$blog = get_page_by_path( 'blog' );
 	if ( ! $blog ) {
@@ -439,15 +450,34 @@ function dd_build_primary_menu() {
 			'menu-item-status'    => 'publish',
 		) );
 	}
-	$about = get_page_by_path( 'about' );
+	$about     = get_page_by_path( 'about' );
+	$breakdown = get_page_by_path( 'breakdown' );
 	if ( $about ) {
-		wp_update_nav_menu_item( $menu_id, 0, array(
+		$about_parent = wp_update_nav_menu_item( $menu_id, 0, array(
 			'menu-item-title'     => __( 'About', 'digital-district' ),
 			'menu-item-object'    => 'page',
 			'menu-item-object-id' => $about->ID,
 			'menu-item-type'      => 'post_type',
 			'menu-item-status'    => 'publish',
 		) );
+		if ( $breakdown ) {
+			wp_update_nav_menu_item( $menu_id, 0, array(
+				'menu-item-title'     => __( 'About', 'digital-district' ),
+				'menu-item-object'    => 'page',
+				'menu-item-object-id' => $about->ID,
+				'menu-item-type'      => 'post_type',
+				'menu-item-parent-id' => $about_parent,
+				'menu-item-status'    => 'publish',
+			) );
+			wp_update_nav_menu_item( $menu_id, 0, array(
+				'menu-item-title'     => __( 'Project Breakdown', 'digital-district' ),
+				'menu-item-object'    => 'page',
+				'menu-item-object-id' => $breakdown->ID,
+				'menu-item-type'      => 'post_type',
+				'menu-item-parent-id' => $about_parent,
+				'menu-item-status'    => 'publish',
+			) );
+		}
 	}
 	$contact = get_page_by_path( 'contact' );
 	if ( $contact ) {

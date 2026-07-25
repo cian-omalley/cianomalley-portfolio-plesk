@@ -296,7 +296,9 @@
     var glyphs = '0123456789<>-_/[]=+*#%ABCDEF';
     function scramble(el) {
       var text = el.textContent;
-      if (text.length > 48) return; // leave long strings alone
+      // Only decode short, decorative readouts — longer informative labels
+      // stay legible (never flash as garbled text).
+      if (text.length > 24) return;
       var start = performance.now();
       var dur = 60 * text.length + 260;
       el.classList.add('scrambling');
