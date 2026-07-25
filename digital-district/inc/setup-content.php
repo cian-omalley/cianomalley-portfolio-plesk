@@ -384,29 +384,49 @@ function dd_build_primary_menu() {
 		'menu-item-status'=> 'publish',
 		'menu-item-type'  => 'custom',
 	) );
-	wp_update_nav_menu_item( $menu_id, 0, array(
-		'menu-item-title'     => __( 'Work', 'digital-district' ),
-		'menu-item-object'    => 'client_work',
-		'menu-item-type'      => 'post_type_archive',
-		'menu-item-status'    => 'publish',
-	) );
-	wp_update_nav_menu_item( $menu_id, 0, array(
-		'menu-item-title'  => __( 'Projects', 'digital-district' ),
+
+	// Portfolio group — Projects + Client Work under one dropdown.
+	$portfolio_parent = wp_update_nav_menu_item( $menu_id, 0, array(
+		'menu-item-title'  => __( 'Portfolio', 'digital-district' ),
 		'menu-item-object' => 'project',
 		'menu-item-type'   => 'post_type_archive',
 		'menu-item-status' => 'publish',
 	) );
 	wp_update_nav_menu_item( $menu_id, 0, array(
-		'menu-item-title'  => __( 'Guides', 'digital-district' ),
+		'menu-item-title'     => __( 'Projects', 'digital-district' ),
+		'menu-item-object'    => 'project',
+		'menu-item-type'      => 'post_type_archive',
+		'menu-item-parent-id' => $portfolio_parent,
+		'menu-item-status'    => 'publish',
+	) );
+	wp_update_nav_menu_item( $menu_id, 0, array(
+		'menu-item-title'     => __( 'Client Work', 'digital-district' ),
+		'menu-item-object'    => 'client_work',
+		'menu-item-type'      => 'post_type_archive',
+		'menu-item-parent-id' => $portfolio_parent,
+		'menu-item-status'    => 'publish',
+	) );
+
+	// Writing group — Guides + Reviews + Blog under one dropdown.
+	$writing_parent = wp_update_nav_menu_item( $menu_id, 0, array(
+		'menu-item-title'  => __( 'Writing', 'digital-district' ),
 		'menu-item-object' => 'guide',
 		'menu-item-type'   => 'post_type_archive',
 		'menu-item-status' => 'publish',
 	) );
 	wp_update_nav_menu_item( $menu_id, 0, array(
-		'menu-item-title'  => __( 'Reviews', 'digital-district' ),
-		'menu-item-object' => 'review',
-		'menu-item-type'   => 'post_type_archive',
-		'menu-item-status' => 'publish',
+		'menu-item-title'     => __( 'Guides', 'digital-district' ),
+		'menu-item-object'    => 'guide',
+		'menu-item-type'      => 'post_type_archive',
+		'menu-item-parent-id' => $writing_parent,
+		'menu-item-status'    => 'publish',
+	) );
+	wp_update_nav_menu_item( $menu_id, 0, array(
+		'menu-item-title'     => __( 'Reviews', 'digital-district' ),
+		'menu-item-object'    => 'review',
+		'menu-item-type'      => 'post_type_archive',
+		'menu-item-parent-id' => $writing_parent,
+		'menu-item-status'    => 'publish',
 	) );
 	$blog_id = (int) get_option( 'page_for_posts' );
 	if ( $blog_id ) {
@@ -415,6 +435,7 @@ function dd_build_primary_menu() {
 			'menu-item-object'    => 'page',
 			'menu-item-object-id' => $blog_id,
 			'menu-item-type'      => 'post_type',
+			'menu-item-parent-id' => $writing_parent,
 			'menu-item-status'    => 'publish',
 		) );
 	}

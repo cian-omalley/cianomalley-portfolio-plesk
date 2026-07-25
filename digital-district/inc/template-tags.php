@@ -308,14 +308,77 @@ function dd_nav_links() {
 /**
  * Fallback menu for wp_nav_menu when no menu is assigned to "primary".
  */
+/**
+ * Grouped navigation: two dropdowns (Portfolio, Writing) declutter the bar.
+ * Each entry is [label, url, children?]. Children are [label, url].
+ *
+ * @return array<int, array{label:string,url:string,children?:array}>
+ */
+function dd_nav_groups() {
+	$projects = get_post_type_archive_link( 'project' );
+	$work     = get_post_type_archive_link( 'client_work' );
+	$guides   = get_post_type_archive_link( 'guide' );
+	$reviews  = get_post_type_archive_link( 'review' );
+	$blog_id  = (int) get_option( 'page_for_posts' );
+	$about    = get_page_by_path( 'about' );
+	$contact  = get_page_by_path( 'contact' );
+
+	$groups = array( array( 'label' => __( 'Home', 'digital-district' ), 'url' => home_url( '/' ) ) );
+
+	$portfolio = array();
+	if ( $projects ) {
+		$portfolio[] = array( 'label' => __( 'Projects', 'digital-district' ), 'url' => $projects );
+	}
+	if ( $work ) {
+		$portfolio[] = array( 'label' => __( 'Client Work', 'digital-district' ), 'url' => $work );
+	}
+	if ( $portfolio ) {
+		$groups[] = array( 'label' => __( 'Portfolio', 'digital-district' ), 'url' => $portfolio[0]['url'], 'children' => $portfolio );
+	}
+
+	$writing = array();
+	if ( $guides ) {
+		$writing[] = array( 'label' => __( 'Guides', 'digital-district' ), 'url' => $guides );
+	}
+	if ( $reviews ) {
+		$writing[] = array( 'label' => __( 'Reviews', 'digital-district' ), 'url' => $reviews );
+	}
+	if ( $blog_id ) {
+		$writing[] = array( 'label' => __( 'Blog', 'digital-district' ), 'url' => get_permalink( $blog_id ) );
+	}
+	if ( $writing ) {
+		$groups[] = array( 'label' => __( 'Writing', 'digital-district' ), 'url' => $writing[0]['url'], 'children' => $writing );
+	}
+
+	if ( $about ) {
+		$groups[] = array( 'label' => __( 'About', 'digital-district' ), 'url' => get_permalink( $about ) );
+	}
+	if ( $contact ) {
+		$groups[] = array( 'label' => __( 'Contact', 'digital-district' ), 'url' => get_permalink( $contact ) );
+	}
+	return $groups;
+}
+
+/**
+ * Fallback menu for wp_nav_menu — renders the grouped nav with dropdown
+ * submenus so it matches the default menu when none is assigned.
+ */
 function dd_nav_fallback() {
 	echo '<ul class="nav-menu">';
-	foreach ( dd_nav_links() as $l ) {
-		printf(
-			'<li><a href="%1$s">%2$s</a></li>',
-			esc_url( $l['url'] ),
-			esc_html( $l['label'] )
-		);
+	foreach ( dd_nav_groups() as $g ) {
+		if ( ! empty( $g['children'] ) ) {
+			printf(
+				'<li class="menu-item menu-item-has-children"><a href="%1$s" aria-haspopup="true">%2$s</a><ul class="sub-menu">',
+				esc_url( $g['url'] ),
+				esc_html( $g['label'] )
+			);
+			foreach ( $g['children'] as $c ) {
+				printf( '<li class="menu-item"><a href="%1$s">%2$s</a></li>', esc_url( $c['url'] ), esc_html( $c['label'] ) );
+			}
+			echo '</ul></li>';
+		} else {
+			printf( '<li class="menu-item"><a href="%1$s">%2$s</a></li>', esc_url( $g['url'] ), esc_html( $g['label'] ) );
+		}
 	}
 	echo '</ul>';
 }

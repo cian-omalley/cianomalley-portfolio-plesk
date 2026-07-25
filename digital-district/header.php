@@ -38,7 +38,7 @@ defined( 'ABSPATH' ) || exit;
 				'container'      => false,
 				'menu_class'     => 'nav-menu',
 				'fallback_cb'    => 'dd_nav_fallback',
-				'depth'          => 1,
+				'depth'          => 2,
 			) );
 			?>
 		</nav>
@@ -56,9 +56,24 @@ defined( 'ABSPATH' ) || exit;
 		<button class="overlay-menu__close" type="button" data-menu-close aria-label="<?php esc_attr_e( 'Close menu', 'digital-district' ); ?>">&#10005;</button>
 		<p class="hud"><?php esc_html_e( 'Navigate', 'digital-district' ); ?></p>
 		<ul class="overlay-menu__list">
-			<?php foreach ( dd_nav_links() as $l ) : ?>
-				<li><a href="<?php echo esc_url( $l['url'] ); ?>"><?php echo esc_html( $l['label'] ); ?></a></li>
-			<?php endforeach; ?>
+			<?php
+			foreach ( dd_nav_groups() as $g ) :
+				if ( ! empty( $g['children'] ) ) :
+					?>
+					<li class="overlay-menu__group">
+						<span class="overlay-menu__grouplabel"><?php echo esc_html( $g['label'] ); ?></span>
+						<?php foreach ( $g['children'] as $c ) : ?>
+							<a href="<?php echo esc_url( $c['url'] ); ?>"><?php echo esc_html( $c['label'] ); ?></a>
+						<?php endforeach; ?>
+					</li>
+					<?php
+				else :
+					?>
+					<li><a href="<?php echo esc_url( $g['url'] ); ?>"><?php echo esc_html( $g['label'] ); ?></a></li>
+					<?php
+				endif;
+			endforeach;
+			?>
 		</ul>
 	</div>
 </div>

@@ -174,8 +174,35 @@ body.has-cursor a, body.has-cursor button { cursor: none; }
 .nav-toggle { display: inline-flex; align-items: center; gap: var(--s2); background: color-mix(in srgb, var(--surface) 60%, transparent); border: var(--border-hair); color: var(--silver); padding: var(--s2) var(--s3); font-family: var(--font-mono); font-size: 0.78rem; cursor: pointer; }
 .nav-toggle:hover { border-color: var(--acid); color: var(--acid); }
 .nav-toggle kbd { border: var(--border-hair); border-radius: 3px; padding: 0 5px; font-size: 0.66rem; color: var(--muted); }
+
+/* Dropdown groups (desktop) */
+.nav-menu > li { position: relative; }
+.nav-menu .menu-item-has-children > a { display: inline-flex; align-items: center; gap: 5px; }
+.nav-menu .menu-item-has-children > a::after {
+  content: "\25BE"; position: static; inset: auto; height: auto; background: none;
+  font-size: 0.7em; color: var(--muted); transition: transform var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+}
+.nav-menu .menu-item-has-children:hover > a::after,
+.nav-menu .menu-item-has-children:focus-within > a::after { transform: rotate(180deg); color: var(--acid); }
+/* invisible bridge so the 8px gap under the parent doesn't close the menu */
+.nav-menu .menu-item-has-children::after { content: ""; position: absolute; top: 100%; left: 0; right: 0; height: 10px; }
+.nav-menu .sub-menu {
+  position: absolute; top: calc(100% + 8px); left: 0; min-width: 190px;
+  list-style: none; margin: 0; padding: var(--s2);
+  display: grid; gap: 2px;
+  background: var(--surface); border: var(--border-hair); box-shadow: var(--glow-violet);
+  opacity: 0; visibility: hidden; transform: translateY(6px);
+  transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease), visibility var(--dur-2);
+  z-index: var(--z-menu);
+}
+.nav-menu .menu-item-has-children:hover > .sub-menu,
+.nav-menu .menu-item-has-children:focus-within > .sub-menu { opacity: 1; visibility: visible; transform: none; }
+.nav-menu .sub-menu a { display: block; padding: var(--s2) var(--s3); font-size: 0.78rem; }
+.nav-menu .sub-menu a::after { display: none; }
+.nav-menu .sub-menu a:hover { color: var(--acid); background: color-mix(in srgb, var(--surface-2) 70%, transparent); }
+
 /* Inline nav on wide screens only; tablets and phones use the overlay menu so
-   the eight items never crowd or overflow the bar. */
+   the grouped items never crowd or overflow the bar. */
 @media (min-width: 1024px) { .nav-menu { display: flex; } .nav-toggle { display: none; } }
 @media (min-width: 1024px) and (max-width: 1160px) { .nav-menu { gap: var(--s4); } .nav-menu a { font-size: 0.74rem; } }
 
@@ -183,10 +210,14 @@ body.has-cursor a, body.has-cursor button { cursor: none; }
 .overlay-menu { position: fixed; inset: 0; z-index: var(--z-modal); display: none; place-items: center; padding: var(--s4); }
 .overlay-menu.is-open { display: grid; }
 .overlay-menu__backdrop { position: absolute; inset: 0; background: rgb(5 6 10 / 0.85); backdrop-filter: blur(8px); border: none; }
-.overlay-menu__panel { position: relative; width: min(100%, 560px); padding: var(--s6); }
+.overlay-menu__panel { position: relative; width: min(100%, 560px); max-height: 88svh; overflow-y: auto; padding: var(--s6); }
 .overlay-menu__list { list-style: none; margin: var(--s5) 0 0; padding: 0; display: grid; gap: var(--s2); }
 .overlay-menu__list a { display: block; padding: var(--s4); border: var(--border-hair); background: color-mix(in srgb, var(--surface-2) 60%, transparent); font-family: var(--font-display); font-size: 1.25rem; color: var(--ink); transition: border-color var(--dur-2) var(--ease), transform var(--dur-2) var(--ease), color var(--dur-2) var(--ease); }
 .overlay-menu__list a:hover { border-color: var(--acid); color: var(--acid); transform: translateX(6px); }
+/* Grouped sections inside the overlay (Portfolio / Writing) */
+.overlay-menu__group { display: grid; gap: var(--s2); }
+.overlay-menu__grouplabel { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--muted); padding: var(--s3) var(--s1) 2px; }
+.overlay-menu__group a { font-size: 1.05rem; }
 .overlay-menu__close { position: absolute; top: var(--s4); right: var(--s4); background: none; border: none; color: var(--silver); font-size: 1.2rem; cursor: pointer; }
 .overlay-menu__close:hover { color: var(--acid); }
 
@@ -347,6 +378,10 @@ body.has-cursor a, body.has-cursor button { cursor: none; }
   .hero__inner { padding-block: var(--s9); }
   .single-hero { padding-block: var(--s8) var(--s5); }
   .stats { grid-template-columns: repeat(2, 1fr); }
+  /* Comfortable touch targets on tablet/phone (WCAG ~44px). */
+  .nav-toggle { min-height: 44px; padding-inline: var(--s4); }
+  .overlay-menu__close { padding: var(--s3); font-size: 1.4rem; }
+  .overlay-menu__list a { padding: var(--s4); }
 }
 
 /* Phone: single-column everything, smaller pads, no fixed HUD clutter. */
