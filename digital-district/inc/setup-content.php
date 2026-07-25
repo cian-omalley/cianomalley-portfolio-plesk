@@ -27,6 +27,7 @@ function dd_after_switch_theme() {
 	dd_seed_guides();
 	dd_seed_reviews();
 	dd_seed_client_templates();
+	dd_seed_posts();
 	dd_build_primary_menu();
 
 	if ( ! wp_next_scheduled( 'dd_github_cron' ) ) {
@@ -295,6 +296,65 @@ function dd_seed_projects() {
 		if ( $id && ! is_wp_error( $id ) ) {
 			update_post_meta( $id, 'dd_status', $p[2] );
 			wp_set_object_terms( $id, $p[3], 'tech' );
+		}
+	}
+}
+
+/**
+ * Seed the blog with honest journal posts and remove WordPress's default
+ * "Hello world!" post and "Sample Page". Runs once (skips if real posts exist).
+ */
+function dd_seed_posts() {
+	// Remove the stock placeholders.
+	$hello = get_page_by_path( 'hello-world', OBJECT, 'post' );
+	if ( $hello ) {
+		wp_delete_post( $hello->ID, true );
+	}
+	$sample = get_page_by_path( 'sample-page' );
+	if ( $sample ) {
+		wp_delete_post( $sample->ID, true );
+	}
+
+	// Only seed once.
+	$have = get_posts( array( 'post_type' => 'post', 'posts_per_page' => 1, 'fields' => 'ids', 'post_status' => 'any' ) );
+	if ( ! empty( $have ) ) {
+		return;
+	}
+
+	$posts = array(
+		array(
+			'Building this portfolio in the open',
+			'Journal',
+			'<p>This site is being built in public — every decision documented as it happens. The goal is a portfolio that doubles as a case study: how it is made is part of what it shows.</p><h2>The stack</h2><p>A hand-coded WordPress theme, no page builder, running on a self-hosted stack behind Cloudflare and designed to sit happily on Plesk. Everything is editable in wp-admin; the theme just renders it.</p><h2>What is next</h2><p>Written guides on each part of the build, then the video versions. The writing ships first.</p>',
+		),
+		array(
+			'Why I self-host almost everything',
+			'Self-Hosting',
+			'<p>Owning the stack is the whole point. The same portable stack — Nginx, PHP, MariaDB, Redis — runs at home now and moves to a VPS later without a rebuild, so there is no lock-in and no surprise bills.</p><h2>Hiding the home IP</h2><p>A Cloudflare Tunnel fronts everything, so the residential IP is never exposed and the eventual VPS move is a DNS change, not a migration.</p><h2>The trade-off</h2><p>More responsibility, far more control. For a developer portfolio that is exactly the right trade.</p>',
+		),
+		array(
+			'Going builder-free on WordPress',
+			'WordPress',
+			'<p>No Oxygen, no Elementor, no drag-and-drop. Just PHP templates, CSS custom properties, and a little vanilla JavaScript. The result is faster, lighter, and completely portable.</p><h2>Custom post types do the work</h2><p>Projects, client work, guides and reviews are custom post types with their own templates. Content lives in the database; the theme renders it. SEO plugins keep full control of titles and meta.</p>',
+		),
+		array(
+			'Pulling my GitHub repos into the site automatically',
+			'WordPress',
+			'<p>The Projects section imports every public repository straight from GitHub, mapping each repo to a project with a status derived from its activity. A one-click re-sync in wp-admin keeps it fresh, and any write-ups edited by hand are preserved.</p><h2>Honest by default</h2><p>Archived repos read as complete, near-empty ones as planning, active ones as in progress — no manual bookkeeping, no invented status.</p>',
+		),
+	);
+
+	foreach ( $posts as $i => $p ) {
+		$id = wp_insert_post( array(
+			'post_type'    => 'post',
+			'post_status'  => 'publish',
+			'post_title'   => $p[0],
+			'post_content' => $p[2],
+			'post_excerpt' => wp_strip_all_tags( substr( $p[2], 3, 160 ) ),
+			'post_date'    => gmdate( 'Y-m-d H:i:s', time() - ( $i + 1 ) * DAY_IN_SECONDS ),
+		) );
+		if ( $id && ! is_wp_error( $id ) ) {
+			wp_set_object_terms( $id, $p[1], 'category' );
 		}
 	}
 }

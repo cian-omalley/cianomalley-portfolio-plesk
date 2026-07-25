@@ -179,10 +179,54 @@ endif;
 wp_reset_postdata();
 ?>
 
+<?php
+$dd_posts = new WP_Query( array(
+	'post_type'      => 'post',
+	'posts_per_page' => 3,
+	'no_found_rows'  => true,
+) );
+if ( $dd_posts->have_posts() ) :
+	?>
+	<section id="journal" class="container" style="scroll-margin-top:80px">
+		<?php
+		dd_section_heading(
+			'05',
+			__( 'Journal', 'digital-district' ),
+			__( 'Latest from the blog', 'digital-district' ),
+			__( 'Build notes and self-hosting field reports.', 'digital-district' )
+		);
+		?>
+		<div class="grid grid--3">
+			<?php
+			$dd_i = 0;
+			while ( $dd_posts->have_posts() ) :
+				$dd_posts->the_post();
+				$dd_cats  = get_the_category();
+				$dd_label = $dd_cats ? $dd_cats[0]->name : __( 'Post', 'digital-district' );
+				?>
+				<article class="card reveal" data-delay="<?php echo esc_attr( ( $dd_i % 3 ) * 70 ); ?>">
+					<a class="card__thumb card__thumb--ph" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true" data-label="<?php echo esc_attr( $dd_label ); ?>"></a>
+					<div class="card__top"><span class="hud" style="letter-spacing:.12em;color:var(--cyan)"><?php echo esc_html( $dd_label ); ?></span><span class="card__no"><?php echo esc_html( get_the_date( 'M j' ) ); ?></span></div>
+					<h3 style="margin:0"><a class="title-link" href="<?php the_permalink(); ?>"><span><?php the_title(); ?></span> <span class="arrow" aria-hidden="true">&rarr;</span></a></h3>
+					<p style="color:var(--muted);font-size:.95rem;margin:0"><?php echo esc_html( get_the_excerpt() ); ?></p>
+					<span class="card__sweep" aria-hidden="true"></span>
+				</article>
+				<?php
+				$dd_i++;
+			endwhile;
+			?>
+		</div>
+		<p class="reveal" style="margin-top:32px"><a class="btn btn--ghost magnetic" href="<?php echo esc_url( get_permalink( get_option( 'page_for_posts' ) ) ); ?>"><?php esc_html_e( 'Read the blog', 'digital-district' ); ?> &rarr;</a></p>
+	</section>
+	<?php
+endif;
+wp_reset_postdata();
+?>
+
 <section id="principles" class="container" style="scroll-margin-top:80px">
 	<?php
 	dd_section_heading(
-		'05',
+		'06',
 		__( 'Principles', 'digital-district' ),
 		__( 'How the work gets built', 'digital-district' )
 	);

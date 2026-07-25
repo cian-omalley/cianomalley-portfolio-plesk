@@ -326,8 +326,25 @@
     });
   }
 
+  /* ---- Reading progress bar on article pages ---- */
+  function initProgress() {
+    var bar = document.querySelector('.read-progress span');
+    var article = document.querySelector('.entry-content');
+    if (!bar || !article) return;
+    function update() {
+      var rect = article.getBoundingClientRect();
+      var total = rect.height - window.innerHeight;
+      var scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 1));
+      bar.style.transform = 'scaleX(' + (total > 0 ? scrolled / total : 0) + ')';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    update();
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initFx();
+    initProgress();
     initReveal();
     initCounters();
     initCursor();

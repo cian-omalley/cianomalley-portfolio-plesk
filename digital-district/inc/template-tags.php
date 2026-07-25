@@ -47,6 +47,16 @@ function dd_status_pill( $status ) {
 }
 
 /**
+ * Estimate reading time in minutes for the current post (≈220 wpm, min 1).
+ *
+ * @return int
+ */
+function dd_reading_time() {
+	$words = str_word_count( wp_strip_all_tags( get_the_content() ) );
+	return max( 1, (int) round( $words / 220 ) );
+}
+
+/**
  * Render a 1–5 star rating from a numeric value.
  *
  * @param int|string $rating Rating value.
@@ -177,6 +187,7 @@ function dd_single() {
 	$archive = ( 'client_work' === $type ) ? get_post_type_archive_link( 'client_work' ) : get_post_type_archive_link( 'project' );
 	$back    = ( 'client_work' === $type ) ? __( 'Back to Work', 'digital-district' ) : __( 'Back to Projects', 'digital-district' );
 	?>
+	<div class="read-progress" aria-hidden="true"><span></span></div>
 	<article <?php post_class(); ?>>
 		<section class="single-hero">
 			<div class="container">

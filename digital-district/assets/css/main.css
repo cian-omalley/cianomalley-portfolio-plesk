@@ -456,3 +456,41 @@ body.has-cursor a, body.has-cursor button { cursor: none; }
   .status::before { animation: none; }
   .title-link:hover span:first-child { animation: none; }
 }
+
+/* Reading progress bar (article singles). Scroll-driven, scaleX transform. */
+.read-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: var(--z-nav);
+  background: transparent; pointer-events: none;
+}
+.read-progress span {
+  display: block; height: 100%; transform-origin: left; transform: scaleX(0);
+  background: linear-gradient(90deg, var(--violet), var(--acid));
+  box-shadow: var(--glow-acid);
+}
+
+/* ---- Comments (blog posts) ---- */
+#comments { margin-top: var(--s8); }
+.comments-title, .comment-reply-title { font-family: var(--font-display); }
+.comment-list { list-style: none; margin: 0 0 var(--s7); padding: 0; }
+.comment-list li { border: var(--border-hair); padding: var(--s4); margin-bottom: var(--s3); background: color-mix(in srgb, var(--surface) 50%, transparent); }
+.comment-author .fn { font-family: var(--font-display); }
+.comment-metadata a, .comment-author a { color: var(--muted); font-family: var(--font-mono); font-size: 0.78rem; }
+.comment-form { display: grid; gap: var(--s3); }
+.comment-form p { margin: 0; display: flex; flex-direction: column; gap: var(--s2); }
+.comment-form label { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.06em; color: var(--silver); }
+.comment-form input[type="text"],
+.comment-form input[type="email"],
+.comment-form input[type="url"],
+.comment-form textarea {
+  background: var(--void); border: var(--border-hair); color: var(--ink);
+  font: inherit; padding: var(--s3); width: 100%; max-width: 100%;
+  transition: border-color var(--dur-1) var(--ease);
+}
+.comment-form input:focus, .comment-form textarea:focus { outline: none; border-color: var(--cyan); }
+.comment-form .form-submit input, #submit {
+  background: var(--acid); color: var(--void); border: none; cursor: pointer;
+  font-family: var(--font-mono); font-size: 0.85rem; padding: var(--s3) var(--s5);
+  box-shadow: var(--glow-acid);
+}
+.comment-form .comment-form-cookies-consent { flex-direction: row; align-items: center; }
+.comment-reply-link { color: var(--cyan); font-family: var(--font-mono); font-size: 0.78rem; }
