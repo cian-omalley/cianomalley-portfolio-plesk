@@ -104,6 +104,8 @@ function dd_archive_order( $query ) {
 	}
 	if ( $query->is_post_type_archive( array( 'project', 'client_work', 'guide', 'review' ) ) ) {
 		$query->set( 'orderby', array( 'menu_order' => 'ASC', 'date' => 'DESC' ) );
+		// Portfolio sets are small — show them on one page (still paginates beyond 24).
+		$query->set( 'posts_per_page', 24 );
 	}
 }
 add_action( 'pre_get_posts', 'dd_archive_order' );
