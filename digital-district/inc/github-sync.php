@@ -193,6 +193,71 @@ function dd_prettify_repo( $name ) {
 }
 
 /**
+ * Build a detailed written breakdown for a repository from its metadata. Used
+ * when a repo has no README so every project page still carries a full
+ * explanation rather than a one-line description.
+ *
+ * @param array $repo One repository from the API.
+ * @return string Safe HTML.
+ */
+function dd_github_breakdown( $repo ) {
+	$name    = dd_prettify_repo( $repo['name'] ?? '' );
+	$desc    = trim( (string) ( $repo['description'] ?? '' ) );
+	$lang    = (string) ( $repo['language'] ?? '' );
+	$topics  = ( ! empty( $repo['topics'] ) && is_array( $repo['topics'] ) ) ? $repo['topics'] : array();
+	$year    = ! empty( $repo['created_at'] ) ? gmdate( 'Y', strtotime( $repo['created_at'] ) ) : '';
+	$updated = ! empty( $repo['pushed_at'] ) ? human_time_diff( strtotime( $repo['pushed_at'] ) ) : '';
+	$status  = dd_github_status( $repo );
+
+	$out  = '<h2>' . esc_html__( 'Overview', 'digital-district' ) . '</h2>';
+	if ( $desc ) {
+		$out .= '<p>' . esc_html( $desc ) . '</p>';
+	}
+	$out .= '<p>' . esc_html( sprintf(
+		/* translators: %s: project name. */
+		__( '%s is part of the wider cianomalley.works ecosystem — a connected set of repositories that share a design system, brand, and documentation. This page is generated from the repository so it stays in sync with the code; add a README to the repo to replace it with your own write-up.', 'digital-district' ),
+		$name
+	) ) . '</p>';
+
+	$out .= '<h2>' . esc_html__( 'Built with', 'digital-district' ) . '</h2>';
+	if ( $lang || $topics ) {
+		$parts = array();
+		if ( $lang ) {
+			$parts[] = $lang;
+		}
+		$parts = array_merge( $parts, $topics );
+		$out  .= '<p>' . esc_html( sprintf(
+			/* translators: %s: comma-separated technologies. */
+			__( 'Primary technologies: %s. The stack is deliberately portable and self-hostable, matching the rest of the ecosystem so nothing is locked to a single host or platform.', 'digital-district' ),
+			implode( ', ', $parts )
+		) ) . '</p>';
+	} else {
+		$out .= '<p>' . esc_html__( 'The stack is deliberately portable and self-hostable, matching the rest of the ecosystem so nothing is locked to a single host or platform.', 'digital-district' ) . '</p>';
+	}
+
+	$out .= '<h2>' . esc_html__( 'Status', 'digital-district' ) . '</h2>';
+	$explain = array(
+		'In Progress' => __( 'This project is under active development, with regular commits. The architecture and core loops come first; features are layered on once the foundation is stable.', 'digital-district' ),
+		'Planning'    => __( 'This project is being scoped and scaffolded. The repository exists as the home for the work, with the shape of it still being planned before the bulk of the code lands.', 'digital-district' ),
+		'Complete'    => __( 'This project has reached a finished, usable state and is not under active change — a reusable artefact rather than a moving target.', 'digital-district' ),
+		'Prototype'   => __( 'This is an exploratory prototype: a place to try an idea end to end before committing to a production build.', 'digital-district' ),
+		'Research'    => __( 'This is early research — a space for structured experiments, notes, and comparisons rather than a shipping product.', 'digital-district' ),
+		'Live'        => __( 'This project is live and in use.', 'digital-district' ),
+	);
+	$out .= '<p>' . esc_html( $explain[ $status ] ?? $explain['In Progress'] );
+	if ( $year ) {
+		$out .= ' ' . esc_html( sprintf( /* translators: %s: year. */ __( 'Started in %s.', 'digital-district' ), $year ) );
+	}
+	if ( $updated ) {
+		$out .= ' ' . esc_html( sprintf( /* translators: %s: relative time. */ __( 'Last updated %s ago.', 'digital-district' ), $updated ) );
+	}
+	$out .= '</p>';
+	$out .= '<p>' . esc_html__( 'Follow the repository for the full source and the latest changes.', 'digital-district' ) . '</p>';
+
+	return wp_kses_post( $out );
+}
+
+/**
  * Fetch and upsert all public repositories.
  *
  * @return int|WP_Error Number of repositories synced, or an error.
@@ -252,10 +317,12 @@ function dd_sync_github() {
 			$data['ID'] = $post_id;
 			$post_id    = wp_update_post( $data, true );
 		} else {
-			// Pull the repo README for a detailed body; fall back to the description.
+			// Pull the repo README for a detailed body; if there isn't one,
+			// generate a full breakdown from the repo metadata so every project
+			// page carries a real explanation, not a one-liner.
 			$body                 = dd_github_readme_html( dd_github_user(), $repo['name'] );
 			$data['post_title']   = dd_prettify_repo( $repo['name'] );
-			$data['post_content'] = $body ? $body : ( $desc ? '<p>' . esc_html( $desc ) . '</p>' : '' );
+			$data['post_content'] = $body ? $body : dd_github_breakdown( $repo );
 			$data['menu_order']   = 100 + $i; // GitHub imports sit after curated ones.
 			$post_id              = wp_insert_post( $data, true );
 		}
