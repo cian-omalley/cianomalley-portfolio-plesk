@@ -252,12 +252,89 @@
     requestAnimationFrame(loop);
   }
 
+  /* ---- Atmosphere layers (scanline veil + hero aurora) ---- */
+  function initFx() {
+    if (!reduce) {
+      var scan = document.createElement('div');
+      scan.className = 'fx-scan';
+      scan.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(scan);
+    }
+    var scene = document.querySelector('.hero__scene');
+    if (scene) {
+      var aur = document.createElement('div');
+      aur.className = 'hero__aurora';
+      aur.setAttribute('aria-hidden', 'true');
+      scene.appendChild(aur);
+    }
+  }
+
+  /* ---- Interactive cards: 3D tilt + cursor spotlight ---- */
+  function initTilt() {
+    if (!fine || reduce) return;
+    document.querySelectorAll('.card').forEach(function (card) {
+      card.addEventListener('pointermove', function (e) {
+        var r = card.getBoundingClientRect();
+        var px = (e.clientX - r.left) / r.width;
+        var py = (e.clientY - r.top) / r.height;
+        card.style.setProperty('--mx', (px * 100) + '%');
+        card.style.setProperty('--my', (py * 100) + '%');
+        card.style.transition = 'transform 80ms linear';
+        card.style.transform =
+          'perspective(900px) rotateY(' + (px - 0.5) * 6 + 'deg) rotateX(' + (0.5 - py) * 6 + 'deg) translateY(-4px)';
+      });
+      card.addEventListener('pointerleave', function () {
+        card.style.transition = 'transform var(--dur-2) var(--ease)';
+        card.style.transform = '';
+      });
+    });
+  }
+
+  /* ---- Text decode / scramble on the mono HUD readouts ---- */
+  function initScramble() {
+    if (reduce || !('IntersectionObserver' in window)) return;
+    var glyphs = '0123456789<>-_/[]=+*#%ABCDEF';
+    function scramble(el) {
+      var text = el.textContent;
+      if (text.length > 48) return; // leave long strings alone
+      var start = performance.now();
+      var dur = 60 * text.length + 260;
+      el.classList.add('scrambling');
+      function frame(now) {
+        var p = Math.min((now - start) / dur, 1);
+        var reveal = Math.floor(p * text.length);
+        var out = '';
+        for (var i = 0; i < text.length; i++) {
+          if (i < reveal || text[i] === ' ') out += text[i];
+          else out += glyphs[(Math.random() * glyphs.length) | 0];
+        }
+        el.textContent = out;
+        if (p < 1) requestAnimationFrame(frame);
+        else { el.textContent = text; el.classList.remove('scrambling'); }
+      }
+      requestAnimationFrame(frame);
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { scramble(e.target); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.6 });
+    // Only text-only HUD labels (skip ones containing child elements, e.g. the
+    // numbered section eyebrows, so their coloured markup is preserved).
+    document.querySelectorAll('.hud').forEach(function (el) {
+      if (el.childElementCount === 0 && el.textContent.trim()) io.observe(el);
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    initFx();
     initReveal();
     initCounters();
     initCursor();
     initMagnetic();
     initMenu();
     initHero();
+    initTilt();
+    initScramble();
   });
 })();

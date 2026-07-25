@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'DD_VERSION', '1.0.0' );
+define( 'DD_VERSION', '1.1.0' );
 
 if ( ! function_exists( 'dd_setup' ) ) {
 	/**

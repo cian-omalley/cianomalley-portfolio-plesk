@@ -384,3 +384,75 @@ body.has-cursor a, body.has-cursor button { cursor: none; }
   .hero__title { word-break: break-word; }
   .nav .brand span:last-child { font-size: 0.9rem; }
 }
+
+/* =========================================================================
+   Artistic & interactive layer
+   ========================================================================= */
+
+/* Animated aurora behind the hero — slow, subtle, sits over the canvas fog. */
+.hero__aurora {
+  position: absolute; inset: -20% -10% auto -10%; height: 70%;
+  z-index: 0; pointer-events: none; opacity: 0.5; filter: blur(40px);
+  background:
+    radial-gradient(40% 60% at 20% 30%, rgb(124 58 237 / 0.55), transparent 70%),
+    radial-gradient(40% 60% at 80% 20%, rgb(255 46 136 / 0.40), transparent 70%),
+    radial-gradient(50% 70% at 60% 80%, rgb(34 211 238 / 0.30), transparent 70%);
+  background-size: 200% 200%;
+  animation: aurora 18s ease-in-out infinite alternate;
+}
+@keyframes aurora {
+  0%   { background-position: 0% 50%; transform: translateY(0); }
+  100% { background-position: 100% 50%; transform: translateY(-4%); }
+}
+
+/* Faint moving scanline veil over the whole page (atmosphere, never flashing). */
+.fx-scan {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.5;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgb(200 205 216 / 0.025) 3px 4px);
+  mix-blend-mode: overlay;
+}
+.fx-scan::after {
+  content: ""; position: absolute; left: 0; right: 0; height: 40vh;
+  background: linear-gradient(180deg, transparent, rgb(124 58 237 / 0.06), transparent);
+  animation: scanpass 8s linear infinite;
+}
+@keyframes scanpass { 0% { transform: translateY(-50vh); } 100% { transform: translateY(150vh); } }
+
+/* Interactive card: 3D tilt (JS-driven) + a cursor-following spotlight. */
+.card { transform-style: preserve-3d; }
+.card::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0; transition: opacity var(--dur-2) var(--ease);
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 50%), rgb(204 255 0 / 0.10), transparent 60%);
+}
+.card:hover::before { opacity: 1; }
+.card > * { position: relative; z-index: 2; }
+.card__sweep { z-index: 3; }
+
+/* Marquee pauses when you hover it. */
+.marquee:hover .marquee__track { animation-play-state: paused; }
+
+/* Status dots gently pulse. */
+.status::before { animation: dotpulse 2.4s var(--ease) infinite; }
+@keyframes dotpulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+/* Title link gets a quick RGB-split glitch on hover (subtle, hover-only). */
+@media (hover: hover) {
+  .title-link:hover span:first-child { animation: glitch 340ms steps(2) 1; }
+}
+@keyframes glitch {
+  0% { text-shadow: 0 0 18px rgb(204 255 0 / 0.55); }
+  30% { text-shadow: -2px 0 var(--cyan), 2px 0 var(--magenta); }
+  60% { text-shadow: 2px 0 var(--cyan), -2px 0 var(--magenta); }
+  100% { text-shadow: 0 0 18px rgb(204 255 0 / 0.55); }
+}
+
+/* Scramble cursor caret shown while text decodes. */
+.scrambling { color: var(--acid); }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__aurora, .fx-scan::after { animation: none; }
+  .fx-scan { display: none; }
+  .status::before { animation: none; }
+  .title-link:hover span:first-child { animation: none; }
+}

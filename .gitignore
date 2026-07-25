@@ -27,3 +27,6 @@ Thumbs.db
 
 # typescript incremental build info
 *.tsbuildinfo
+
+# packaged theme (build with ./package.sh)
+digital-district.zip

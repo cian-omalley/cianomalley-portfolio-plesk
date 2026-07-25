@@ -129,7 +129,7 @@ function dd_seed_guides() {
 			'WordPress Without a Page Builder',
 			'A fast, maintainable WordPress site using core tooling — like this one.',
 			'Published', '11 min', array( 'WordPress', 'PHP' ),
-			"<h2>Hand-coded, not builder-locked</h2>\n<p>This very site is a hand-coded theme: PHP templates, CSS custom properties, and a little vanilla JavaScript. No Oxygen, no Elementor — nothing you cannot move off in an afternoon.</p>\n<h2>Custom post types do the heavy lifting</h2>\n<p>Projects, client work, guides, and reviews are custom post types with their own templates. Content lives in the database and is edited in wp-admin; the theme just renders it.</p>\n<h2>Keep SEO plugins happy</h2>\n<p>Declare <code>title-tag</code> support and never hard-code titles, so Yoast, The SEO Framework, or Rank Math can manage metadata cleanly.</p>",
+			"<h2>Hand-coded, not builder-locked</h2>\n<p>This very site is a hand-coded theme: PHP templates, CSS custom properties, and a little vanilla JavaScript. No page builders — nothing you cannot move off in an afternoon.</p>\n<h2>Custom post types do the heavy lifting</h2>\n<p>Projects, client work, guides, and reviews are custom post types with their own templates. Content lives in the database and is edited in wp-admin; the theme just renders it.</p>\n<h2>Keep SEO plugins happy</h2>\n<p>Declare <code>title-tag</code> support and never hard-code titles, so Yoast, The SEO Framework, or Rank Math can manage metadata cleanly.</p>",
 		),
 		array(
 			'A JetBrains-Centred Workflow',
@@ -230,12 +230,12 @@ function dd_seed_reviews() {
 	}
 	$reviews = array(
 		array(
-			'Oxygen Builder 6', 'Oxygen Builder 6', 'In Progress', '4',
-			"<p>A hands-on review written while building a real portfolio with it — the companion piece to the tutorial series.</p>\n<h2>First impressions</h2>\n<p>Version 6 is a significant step up. The component model is more coherent and the output is cleaner than earlier releases.</p>\n<h2>Where it fits</h2>\n<p>Great for template-owned layouts; the architecture contract still keeps data and logic in a plugin, not in builder code. Full verdict once the build ships.</p>",
+			'IntelliJ IDEA Ultimate', 'IntelliJ IDEA Ultimate', 'In Progress', '4',
+			"<p>A hands-on review of the Ultimate edition for polyglot, full-stack development — PHP, Python, and web tooling in one IDE.</p>\n<h2>First impressions</h2>\n<p>The all-in-one integration is the draw: databases, HTTP client, and framework support without a pile of plugins.</p>\n<h2>Where it fits</h2>\n<p>Strong for cross-language projects. Full verdict once it has run a few real builds end to end.</p>",
 		),
 		array(
-			'IntelliJ IDEA Ultimate', 'IntelliJ IDEA Ultimate', 'Planned', '',
-			"<p>The Ultimate edition for polyglot, full-stack development — planned review covering PHP, Python, and web tooling in one IDE.</p>",
+			'Visual Studio Code', 'Visual Studio Code', 'Planned', '',
+			"<p>The open-source editor everyone reaches for — planned review of the extension ecosystem and how far it goes as a full IDE.</p>",
 		),
 		array(
 			'Antigravity', 'Antigravity', 'Planned', '',

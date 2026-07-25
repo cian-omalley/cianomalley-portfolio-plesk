@@ -6,7 +6,7 @@ with **Plesk's WP Toolkit** and any free WordPress **SEO plugin** (Yoast, The SE
 Framework, Rank Math), and it showcases **client work** and **personal projects** through
 custom post types with individual case-study pages.
 
-> This repository is a **separate fork**. The original WordPress/Oxygen build lives in
+> This repository is a **separate fork**. The original WordPress build lives in
 > `cian-omalley/cianomalley-portfolio` and is untouched. The theme lives in
 > [`digital-district/`](digital-district/).
 
@@ -14,7 +14,7 @@ custom post types with individual case-study pages.
 
 - Manage everything in `wp-admin`; install SEO/caching/security extensions from your Plesk
   subscription; update and back up through **WP Toolkit**.
-- No Oxygen, no Elementor, no proprietary builder — just PHP templates, CSS, and vanilla JS.
+- No proprietary page builder — just PHP templates, CSS, and vanilla JS.
 
 ## What it does
 
@@ -57,7 +57,7 @@ cron and **preserves** any titles/write-ups you edit by hand.
 
 ## Install
 
-1. **Zip the theme:** from the repo, `cd digital-district && zip -r ../digital-district.zip .`
+1. **Get the zip:** run `./package.sh` (produces `digital-district.zip`), or download it.
 2. **Upload:** wp-admin → Appearance → Themes → Add New → Upload Theme → choose the zip →
    **Activate** (or install with WP Toolkit / drop the `digital-district` folder into
    `wp-content/themes/`).

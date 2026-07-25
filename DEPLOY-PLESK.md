@@ -3,6 +3,22 @@
 This is a WordPress theme, so you run it on a WordPress site managed by Plesk's **WP
 Toolkit**. No build step, no Node runtime.
 
+## ⚡ Quick install (3 steps)
+
+1. **Get the zip.** Download `digital-district.zip` (or build it: run `./package.sh`).
+2. **Install WordPress** on your domain in Plesk → **WP Toolkit → Install** (skip if you
+   already have one). Set the site **Title** and **Tagline** under Settings → General —
+   the theme uses them in the hero and footer.
+3. **Upload & activate:** wp-admin → **Appearance → Themes → Add New → Upload Theme** →
+   choose `digital-district.zip` → **Install** → **Activate**.
+
+That's it. On activation the theme **builds the whole site for you** — pages (Home, About,
+Contact, Blog), the nav menu, sample content, and it imports your GitHub repositories into
+Projects. Permalinks are flushed automatically, so `/work/`, `/projects/`, `/guides/`, and
+`/reviews/` work immediately. Then just enable HTTPS and mail (below).
+
+---
+
 ## 1. Get WordPress running
 
 - Plesk → **WordPress** (WP Toolkit) → **Install** on your domain (e.g. `cianomalley.works`),
