@@ -48,6 +48,37 @@ function dd_on_switch_theme() {
 add_action( 'switch_theme', 'dd_on_switch_theme' );
 
 /**
+ * Self-heal older installs: the first menu build shipped a "Project Breakdown"
+ * item (and a /breakdown/ page) that has since been removed. Existing sites keep
+ * the stale nav entry because the menu is only built on theme activation, so run
+ * a one-time cleanup that removes the leftover menu item and page. Guarded by an
+ * option flag, so it runs at most once.
+ */
+function dd_cleanup_breakdown() {
+	if ( get_option( 'dd_breakdown_removed' ) ) {
+		return;
+	}
+	update_option( 'dd_breakdown_removed', 1 );
+
+	// Remove any nav menu item pointing at the old /breakdown/ page.
+	foreach ( wp_get_nav_menus() as $menu ) {
+		foreach ( wp_get_nav_menu_items( $menu->term_id ) as $item ) {
+			if ( false !== strpos( (string) $item->url, '/breakdown' )
+				|| 'Project Breakdown' === $item->title ) {
+				wp_delete_post( $item->ID, true );
+			}
+		}
+	}
+
+	// Remove the leftover page itself, if it still exists.
+	$page = get_page_by_path( 'breakdown' );
+	if ( $page ) {
+		wp_delete_post( $page->ID, true );
+	}
+}
+add_action( 'init', 'dd_cleanup_breakdown' );
+
+/**
  * Create the About and Contact pages and set a static front page.
  */
 function dd_create_pages() {
