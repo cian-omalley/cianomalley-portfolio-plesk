@@ -529,3 +529,64 @@ body.has-cursor a, body.has-cursor button { cursor: none; }
 }
 .comment-form .comment-form-cookies-consent { flex-direction: row; align-items: center; }
 .comment-reply-link { color: var(--cyan); font-family: var(--font-mono); font-size: 0.78rem; }
+
+/* =========================================================================
+   Neon dial-up — more cyberpunk glow (readability preserved)
+   ========================================================================= */
+
+/* Brighter ambient field + a neon horizon glow at the base of the page. */
+body::after { opacity: 0.5; }
+body::before {
+  background:
+    radial-gradient(60vw 55vw at 82% -8%, rgb(124 58 237 / 0.5), transparent 62%),
+    radial-gradient(46vw 46vw at 6% 4%, rgb(34 211 238 / 0.14), transparent 60%),
+    radial-gradient(60vw 40vw at 50% 112%, rgb(255 46 136 / 0.18), transparent 60%);
+}
+
+/* Hero name: neon gradient + glow on the second line. */
+.hero__title .second {
+  background: linear-gradient(92deg, var(--violet-soft), var(--magenta) 55%, var(--cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 22px rgb(255 46 136 / 0.35));
+}
+.hero__manifesto { text-shadow: 0 0 18px rgb(204 255 0 / 0.45); }
+
+/* Section headings get a faint neon halo; eyebrows glow acid. */
+.section-head h2, .single-hero h1 { text-shadow: 0 0 26px rgb(124 58 237 / 0.28); }
+.hud .idx { text-shadow: 0 0 12px rgb(204 255 0 / 0.6); }
+
+/* Stat numbers glow. */
+.stat__n { text-shadow: 0 0 26px rgb(204 255 0 / 0.4); }
+
+/* Cards: neon edge that lights up on hover; alternating cyan / magenta rails. */
+.card { box-shadow: inset 0 0 0 1px transparent; transition: box-shadow var(--dur-2) var(--ease), transform var(--dur-2) var(--ease); }
+.card:hover { box-shadow: inset 0 0 0 1px rgb(34 211 238 / 0.5), 0 0 30px rgb(34 211 238 / 0.14); }
+.grid > .card:nth-child(3n+2):hover { box-shadow: inset 0 0 0 1px rgb(255 46 136 / 0.5), 0 0 30px rgb(255 46 136 / 0.14); }
+.grid > .card:nth-child(3n):hover { box-shadow: inset 0 0 0 1px rgb(124 58 237 / 0.55), 0 0 30px rgb(124 58 237 / 0.16); }
+.card__sweep { height: 2px; box-shadow: 0 0 12px var(--acid); }
+
+/* Buttons: brighter neon. */
+.btn--primary { box-shadow: 0 0 28px rgb(204 255 0 / 0.35); }
+.btn--primary:hover { box-shadow: 0 0 44px rgb(204 255 0 / 0.6); }
+.btn--ghost:hover { box-shadow: 0 0 22px rgb(34 211 238 / 0.3); }
+
+/* Nav brand mark + brackets glow; active dropdown caret neon. */
+.brand .mark { box-shadow: 0 0 16px rgb(204 255 0 / 0.6); }
+
+/* Marquee slashes glow. */
+.marquee__track span::before { text-shadow: 0 0 10px rgb(204 255 0 / 0.7); }
+
+/* Neon hairline dividers between stacked sections. */
+section + section > .container > .section-head::before {
+  content: ""; display: block; width: 64px; height: 2px; margin-bottom: var(--s5);
+  background: linear-gradient(90deg, var(--acid), transparent);
+  box-shadow: 0 0 10px rgb(204 255 0 / 0.5);
+}
+
+/* Chips + tags pick up a faint neon border on hover. */
+.chip:hover, .card__tag:hover { border-color: rgb(34 211 238 / 0.4); color: var(--cyan); }
+
+/* Reading-progress bar already neon; make the hero scanline brighter. */
+.fx-scan::after { background: linear-gradient(180deg, transparent, rgb(34 211 238 / 0.08), transparent); }
