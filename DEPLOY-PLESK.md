@@ -51,7 +51,16 @@ On activation the theme:
 - seeds honest **guide** and **review** topics,
 - seeds a **curated set of detailed project write-ups** into **Projects** (long-form
   case studies with architecture and breakdowns), and refreshes public repos from GitHub
-  on top of them.
+  on top of them,
+- adds one **`TEMPLATE —` starter draft** per content type (Project, Client Work, Guide,
+  Review, Blog post) that you clone to make your own.
+
+> **Nothing is published on your behalf.** All seeded content and the templates are created
+> as **drafts** — only the structural pages (Home, About, Contact, Blog) are published so
+> the site renders. You review each item in wp-admin and press **Publish** yourself. See
+> **[`AUTHORING.md`](AUTHORING.md)** for the full, non-technical guide to adding projects,
+> client work, guides, reviews, and blog posts using the free WordPress editor. To publish
+> everything on activation instead, add `add_filter( 'dd_seed_status', fn() => 'publish' );`.
 
 ## 3. Fix permalinks (one time)
 

@@ -343,21 +343,24 @@ function dd_sync_github() {
 		$desc = isset( $repo['description'] ) ? (string) $repo['description'] : '';
 
 		$data = array(
-			'post_type'   => 'project',
-			'post_status' => 'publish',
+			'post_type' => 'project',
 		);
 
 		if ( $post_id ) {
 			// Existing (curated or previously-synced) project: preserve the
-			// hand-written title and body. Only refresh the excerpt when the repo
-			// actually has a description, so a blank GitHub description never wipes
-			// a curated excerpt.
+			// hand-written title, body, AND publish state — never force a draft
+			// live or unpublish something you published. Only refresh the excerpt
+			// when the repo actually has a description, so a blank GitHub
+			// description never wipes a curated excerpt.
 			$data['ID'] = $post_id;
 			if ( '' !== $desc ) {
 				$data['post_excerpt'] = $desc;
 			}
 			$post_id = wp_update_post( $data, true );
 		} else {
+			// New repo: create it as a draft (or whatever dd_seed_status filter
+			// says) so nothing goes live until you review and publish it.
+			$data['post_status']  = function_exists( 'dd_seed_status' ) ? dd_seed_status() : 'draft';
 			$data['post_excerpt'] = $desc;
 			// Pull the repo README for a detailed body; if there isn't one,
 			// generate a full breakdown from the repo metadata so every project

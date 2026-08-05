@@ -10,6 +10,27 @@
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Post status used for every piece of SEEDED content — the example projects,
+ * client work, guides, reviews, blog posts, and the "TEMPLATE —" copy-me
+ * starters. Defaults to 'draft', so the theme never publishes anything on your
+ * behalf: you open each item in wp-admin, edit it, and press Publish yourself.
+ *
+ * The structural pages (Home, About, Contact, Blog) are the exception — they
+ * stay published so the site renders and you can preview your drafts.
+ *
+ * Prefer everything to go live on activation instead? Add this one line to a
+ * small mu-plugin or the theme:
+ *
+ *     add_filter( 'dd_seed_status', fn() => 'publish' );
+ *
+ * @return string One of draft|publish|private|pending.
+ */
+function dd_seed_status() {
+	$status = (string) apply_filters( 'dd_seed_status', 'draft' );
+	return in_array( $status, array( 'draft', 'publish', 'private', 'pending' ), true ) ? $status : 'draft';
+}
+
 function dd_after_switch_theme() {
 	dd_register_content();
 	flush_rewrite_rules();
@@ -34,6 +55,7 @@ function dd_after_switch_theme() {
 	dd_seed_reviews();
 	dd_seed_client_templates();
 	dd_seed_posts();
+	dd_seed_templates();
 	dd_build_primary_menu();
 
 	if ( ! wp_next_scheduled( 'dd_github_cron' ) ) {
@@ -143,6 +165,124 @@ function dd_create_pages() {
 }
 
 /**
+ * Seed one clearly-labelled "TEMPLATE —" starter DRAFT per content type. Each is
+ * a copy-me skeleton: a ready-made section structure plus a short how-to intro
+ * at the top, with the Details fields pre-filled with example values. Duplicate
+ * one, replace the text, and publish. Runs once (guarded by an option); safe to
+ * re-run — it skips any template that already exists.
+ */
+function dd_seed_templates() {
+	if ( get_option( 'dd_templates_seeded' ) ) {
+		return;
+	}
+	update_option( 'dd_templates_seeded', 1 );
+
+	$year   = gmdate( 'Y' );
+	$how    = '<p><strong>How to use this template.</strong> Duplicate this draft (Yoast Duplicate Post adds a “Clone” link, or just copy everything below into a new item), replace the placeholder text with your own, fill in the <em>Details</em> box on the right, add a <em>Featured image</em>, and press <strong>Publish</strong> when you are ready. Delete this paragraph before publishing. This item is a <strong>draft</strong>, so it is not visible on the site until you publish it.</p>';
+
+	$templates = array(
+		array(
+			'type'    => 'project',
+			'title'   => 'TEMPLATE — New Project (duplicate me)',
+			'excerpt' => 'One-line summary shown on the project card — replace me.',
+			'tech'    => array( 'Example Tag', 'Another Tag' ),
+			'meta'    => array( 'dd_status' => 'In Progress', 'dd_year' => $year, 'dd_role' => 'Designer & developer', 'dd_repo_url' => '', 'dd_live_url' => '' ),
+			'body'    => $how
+				. "<h2>Overview</h2>\n<p>One or two short paragraphs, in plain language: what the project is and why it exists.</p>\n"
+				. "<h2>The problem</h2>\n<p>What problem does it solve? What was annoying or hard enough that you built it?</p>\n"
+				. "<h2>Architecture</h2>\n<p>How it is put together. A short list of the main parts reads well:</p>\n<ul><li><strong>Part one</strong> — what it does.</li><li><strong>Part two</strong> — what it does.</li><li><strong>Part three</strong> — what it does.</li></ul>\n"
+				. "<h2>How it is built</h2>\n<p>The stack and the key decisions. You can drop in a code block like this:</p>\n<pre><code>example command or snippet</code></pre>\n"
+				. "<h2>Challenges &amp; trade-offs</h2>\n<p>What was genuinely hard, and what you chose to trade off, and why.</p>\n"
+				. "<h2>Status &amp; what's next</h2>\n<p>Where it stands today and where it is going.</p>",
+		),
+		array(
+			'type'    => 'client_work',
+			'title'   => 'TEMPLATE — New Client Project (duplicate me)',
+			'excerpt' => 'One-line summary of the client project — replace me.',
+			'tech'    => array( 'WordPress', 'PHP' ),
+			'meta'    => array( 'dd_client' => 'Client name', 'dd_status' => 'Live', 'dd_services' => 'Design, Build, SEO', 'dd_year' => $year, 'dd_live_url' => '' ),
+			'body'    => $how
+				. "<h2>The brief</h2>\n<p>What the client needed and the problem they came with.</p>\n"
+				. "<h2>Approach</h2>\n<p>How you decided to tackle it, and the priorities you agreed on.</p>\n"
+				. "<h2>What I built</h2>\n<p>The actual work delivered.</p>\n<ul><li>Key outcome one.</li><li>Key outcome two.</li><li>Key outcome three.</li></ul>\n"
+				. "<h2>Outcome</h2>\n<p>The result for the client — ideally something concrete.</p>",
+		),
+		array(
+			'type'    => 'guide',
+			'title'   => 'TEMPLATE — New Guide (duplicate me)',
+			'excerpt' => 'One-line summary of what the guide teaches — replace me.',
+			'tech'    => array( 'Example Tag' ),
+			'meta'    => array( 'dd_status' => 'In Progress', 'dd_read' => '8 min' ),
+			'body'    => $how
+				. "<h2>What this guide covers</h2>\n<p>A sentence or two on what the reader will be able to do by the end.</p>\n"
+				. "<h2>What you'll need</h2>\n<ul><li>Prerequisite one.</li><li>Prerequisite two.</li></ul>\n"
+				. "<h2>Step 1 — do the first thing</h2>\n<p>Explain the step. Commands go in a code block:</p>\n<pre><code>example command</code></pre>\n"
+				. "<h2>Step 2 — do the next thing</h2>\n<p>Keep steps short and in order.</p>\n"
+				. "<h2>Wrapping up</h2>\n<p>Recap and point to what to try next.</p>",
+		),
+		array(
+			'type'    => 'review',
+			'title'   => 'TEMPLATE — New Review (duplicate me)',
+			'excerpt' => 'One-line summary of your verdict — replace me.',
+			'tech'    => array( 'Example Tag' ),
+			'meta'    => array( 'dd_subject' => 'What you are reviewing', 'dd_rating' => '4', 'dd_status' => 'In Progress', 'dd_live_url' => '' ),
+			'body'    => $how
+				. "<h2>What it is</h2>\n<p>Briefly, the thing you are reviewing and the context you used it in.</p>\n"
+				. "<h2>What's good</h2>\n<p>The genuine strengths.</p>\n"
+				. "<h2>What's not</h2>\n<p>The honest weaknesses and trade-offs.</p>\n"
+				. "<h2>Verdict</h2>\n<p>Your overall take, and who it is (and isn't) for. Set the rating and verdict in the Details box.</p>",
+		),
+		array(
+			'type'    => 'post',
+			'title'   => 'TEMPLATE — New Blog Post (duplicate me)',
+			'excerpt' => 'One-line summary shown in the blog list — replace me.',
+			'tech'    => array(),
+			'meta'    => array(),
+			'body'    => $how
+				. "<p>Open with a hook — one paragraph that says what this post is about and why it is worth reading.</p>\n"
+				. "<h2>A first point</h2>\n<p>Say the thing. Keep paragraphs short.</p>\n"
+				. "<h2>A second point</h2>\n<p>Build on it.</p>\n"
+				. "<h2>Wrapping up</h2>\n<p>Close with a takeaway.</p>",
+		),
+	);
+
+	foreach ( $templates as $t ) {
+		// Skip if this template already exists.
+		$exists = get_posts( array(
+			'post_type'   => $t['type'],
+			'post_status' => 'any',
+			'title'       => $t['title'],
+			'fields'      => 'ids',
+			'numberposts' => 1,
+		) );
+		if ( $exists ) {
+			continue;
+		}
+
+		$id = wp_insert_post( array(
+			'post_type'    => $t['type'],
+			'post_status'  => 'draft', // Templates are always drafts.
+			'post_title'   => $t['title'],
+			'post_excerpt' => $t['excerpt'],
+			'post_content' => $t['body'],
+			'menu_order'   => -1, // Sort first in admin lists for easy finding.
+		) );
+		if ( ! $id || is_wp_error( $id ) ) {
+			continue;
+		}
+		update_post_meta( $id, 'dd_template', '1' );
+		foreach ( $t['meta'] as $k => $v ) {
+			if ( '' !== $v ) {
+				update_post_meta( $id, $k, $v );
+			}
+		}
+		if ( ! empty( $t['tech'] ) ) {
+			wp_set_object_terms( $id, $t['tech'], 'tech' );
+		}
+	}
+}
+
+/**
  * Seed guide topics (honest, from the discovery record). Statuses are honest —
  * these are planned/in-progress writing, not claimed as published.
  */
@@ -209,7 +349,7 @@ function dd_seed_guides() {
 	foreach ( $guides as $i => $g ) {
 		$id = wp_insert_post( array(
 			'post_type'    => 'guide',
-			'post_status'  => 'publish',
+			'post_status'  => dd_seed_status(),
 			'post_title'   => $g[0],
 			'post_excerpt' => $g[1],
 			'post_content' => $g[5],
@@ -273,7 +413,7 @@ function dd_seed_client_templates() {
 	foreach ( $items as $i => $c ) {
 		$id = wp_insert_post( array(
 			'post_type'    => 'client_work',
-			'post_status'  => 'publish',
+			'post_status'  => dd_seed_status(),
 			'post_title'   => $c['title'],
 			'post_excerpt' => $c['excerpt'],
 			'post_content' => $c['body'] . $note,
@@ -325,7 +465,7 @@ function dd_seed_reviews() {
 	foreach ( $reviews as $i => $r ) {
 		$id = wp_insert_post( array(
 			'post_type'    => 'review',
-			'post_status'  => 'publish',
+			'post_status'  => dd_seed_status(),
 			'post_title'   => $r[0],
 			'post_excerpt' => sprintf( __( 'A hands-on review of %s.', 'digital-district' ), $r[0] ),
 			'post_content' => $r[4],
@@ -355,7 +495,7 @@ function dd_seed_projects() {
 	foreach ( $projects as $i => $p ) {
 		$id = wp_insert_post( array(
 			'post_type'    => 'project',
-			'post_status'  => 'publish',
+			'post_status'  => dd_seed_status(),
 			'post_title'   => $p['title'],
 			'post_excerpt' => $p['excerpt'],
 			'post_content' => $p['body'],
@@ -429,7 +569,7 @@ function dd_seed_posts() {
 	foreach ( $posts as $i => $p ) {
 		$id = wp_insert_post( array(
 			'post_type'    => 'post',
-			'post_status'  => 'publish',
+			'post_status'  => dd_seed_status(),
 			'post_title'   => $p[0],
 			'post_content' => $p[2],
 			'post_excerpt' => wp_strip_all_tags( substr( $p[2], 3, 160 ) ),
