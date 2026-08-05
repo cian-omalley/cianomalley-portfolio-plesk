@@ -22,6 +22,42 @@ function dd_github_user() {
 }
 
 /**
+ * Optional GitHub personal-access token. When present, the sync uses the
+ * authenticated API so it can import PRIVATE repositories too, and README
+ * fetches are authorised. Define it in wp-config.php — never in the database or
+ * a template:
+ *
+ *     define( 'CIAN_GITHUB_TOKEN', 'github_pat_...' );
+ *
+ * A fine-grained token with read-only "Contents" + "Metadata" is enough.
+ *
+ * @return string Empty string when no token is configured.
+ */
+function dd_github_token() {
+	$token = defined( 'CIAN_GITHUB_TOKEN' ) ? (string) CIAN_GITHUB_TOKEN : '';
+	return (string) apply_filters( 'dd_github_token', $token );
+}
+
+/**
+ * Shared request headers for the GitHub API, adding the Authorization header
+ * when a token is configured.
+ *
+ * @param string $accept Accept media type.
+ * @return array
+ */
+function dd_github_headers( $accept = 'application/vnd.github+json' ) {
+	$headers = array(
+		'Accept'     => $accept,
+		'User-Agent' => 'DigitalDistrict-Theme',
+	);
+	$token = dd_github_token();
+	if ( '' !== $token ) {
+		$headers['Authorization'] = 'Bearer ' . $token;
+	}
+	return $headers;
+}
+
+/**
  * Derive a project status from a repository's metadata.
  *
  * @param array $repo One repository from the API.
@@ -61,11 +97,8 @@ function dd_github_readme_html( $user, $repo ) {
 	$url  = sprintf( 'https://api.github.com/repos/%s/%s/readme', rawurlencode( $user ), rawurlencode( $repo ) );
 	$resp = wp_remote_get( $url, array(
 		'timeout' => 15,
-		'headers' => array(
-			// The "raw" media type returns the README as markdown text.
-			'Accept'     => 'application/vnd.github.raw+json',
-			'User-Agent' => 'DigitalDistrict-Theme',
-		),
+		// The "raw" media type returns the README as markdown text.
+		'headers' => dd_github_headers( 'application/vnd.github.raw+json' ),
 	) );
 	if ( is_wp_error( $resp ) || 200 !== (int) wp_remote_retrieve_response_code( $resp ) ) {
 		return '';
@@ -264,14 +297,17 @@ function dd_github_breakdown( $repo ) {
  */
 function dd_sync_github() {
 	$user = rawurlencode( dd_github_user() );
-	$url  = "https://api.github.com/users/{$user}/repos?per_page=100&sort=updated&type=owner";
+	// With a token, use the authenticated endpoint so PRIVATE repositories are
+	// included; without one, fall back to the public listing (public repos only).
+	if ( '' !== dd_github_token() ) {
+		$url = 'https://api.github.com/user/repos?per_page=100&sort=updated&affiliation=owner&visibility=all';
+	} else {
+		$url = "https://api.github.com/users/{$user}/repos?per_page=100&sort=updated&type=owner";
+	}
 
 	$response = wp_remote_get( $url, array(
 		'timeout' => 20,
-		'headers' => array(
-			'Accept'     => 'application/vnd.github+json',
-			'User-Agent' => 'DigitalDistrict-Theme',
-		),
+		'headers' => dd_github_headers(),
 	) );
 
 	if ( is_wp_error( $response ) ) {
@@ -332,7 +368,13 @@ function dd_sync_github() {
 		}
 
 		update_post_meta( $post_id, 'dd_repo_id', $repo_id );
-		update_post_meta( $post_id, 'dd_repo_url', esc_url_raw( $repo['html_url'] ?? '' ) );
+
+		// Private repositories have no publicly reachable page, so record the
+		// flag and skip the outbound link (the template shows a "Private" note
+		// instead of a dead GitHub link for visitors).
+		$is_private = ! empty( $repo['private'] );
+		update_post_meta( $post_id, 'dd_private', $is_private ? '1' : '' );
+		update_post_meta( $post_id, 'dd_repo_url', $is_private ? '' : esc_url_raw( $repo['html_url'] ?? '' ) );
 		if ( ! empty( $repo['homepage'] ) ) {
 			update_post_meta( $post_id, 'dd_live_url', esc_url_raw( $repo['homepage'] ) );
 		}

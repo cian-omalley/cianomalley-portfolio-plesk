@@ -1,7 +1,11 @@
-# Deploying on Plesk
+# Deploying on Plesk (VPS or shared)
 
 This is a WordPress theme, so you run it on a WordPress site managed by Plesk's **WP
-Toolkit**. No build step, no Node runtime.
+Toolkit**. No build step, no Node runtime. It runs the same on a shared Plesk plan or a
+full **Plesk VPS** — the VPS notes below (§7) only matter if you own the whole server.
+
+**Requirements:** PHP **8.1+**, WordPress **6.5+**, MySQL/MariaDB. Nothing else — no Node,
+no Composer, no external services. All fonts and assets are self-hosted (no CDN calls).
 
 ## ⚡ Quick install (3 steps)
 
@@ -45,7 +49,9 @@ On activation the theme:
 - builds the **primary menu** (Home · Work · Projects · Guides · Reviews · Blog · About ·
   Contact),
 - seeds honest **guide** and **review** topics,
-- **imports every repository** from your GitHub account into **Projects**.
+- seeds a **curated set of detailed project write-ups** into **Projects** (long-form
+  case studies with architecture and breakdowns), and refreshes public repos from GitHub
+  on top of them.
 
 ## 3. Fix permalinks (one time)
 
@@ -72,6 +78,30 @@ sitemap automatically.
 - Optional: a caching plugin from your subscription (e.g. a free page-cache) — the theme is
   static-friendly and cache-safe.
 
+## 7. Running on a Plesk VPS (server owners)
+
+Everything above is enough on shared hosting. On a VPS you control the whole stack, so a
+few extra settings make it fast and tidy. None are required.
+
+- **PHP version & limits.** Plesk → **PHP Settings** for the domain: select **PHP 8.1–8.3
+  (FPM)**. Sensible values: `memory_limit 256M`, `upload_max_filesize 64M`,
+  `post_max_size 64M`, `max_execution_time 120`, `opcache.enable On`. OPcache alone is a
+  large, free speed win for WordPress.
+- **Database.** Plesk installs **MariaDB/MySQL** for you; WP Toolkit wires it up. No manual
+  config needed. Take a Plesk scheduled backup of the domain + database.
+- **Object cache (optional).** If you enable **Redis** in Plesk, drop in a Redis object-cache
+  plugin from your subscription — the theme is cache-safe and benefits, but works fine
+  without it.
+- **Web server.** Plesk's **nginx + Apache** default is fine as-is. If you run
+  **nginx-only**, enable Plesk's static-file caching for the domain; the theme serves its CSS,
+  JS and woff2 fonts as ordinary static files.
+- **Cloudflare (optional).** Point the domain through Cloudflare for TLS, caching and — if
+  you self-host behind a home connection first — a **Tunnel** so the origin IP is never
+  exposed. The theme makes no external calls, so a strict Cloudflare cache/CSP won't break it.
+- **Cron.** WordPress's pseudo-cron drives the daily GitHub re-sync. For a busy VPS, disable
+  it (`define( 'DISABLE_WP_CRON', true );`) and add a real cron in Plesk → **Scheduled Tasks**
+  hitting `wp-cron.php` every 15 minutes.
+
 ## Re-syncing GitHub projects
 
 wp-admin → **Projects → Sync GitHub** re-imports your repositories any time; it also refreshes
@@ -81,6 +111,28 @@ different account, add to a small mu-plugin or the theme:
 ```php
 add_filter( 'dd_github_user', fn() => 'your-github-username' );
 ```
+
+### Importing private repositories
+
+By default the sync only sees **public** repositories. To include **private** ones, add a
+GitHub personal-access token to `wp-config.php` (never the database or a template):
+
+```php
+// wp-config.php — above the "That's all, stop editing" line.
+define( 'CIAN_GITHUB_TOKEN', 'github_pat_...' );
+```
+
+Use a **fine-grained** token scoped to your account with read-only **Contents** and
+**Metadata** permissions — nothing more. With it set, the sync switches to the authenticated
+API and imports private repos too. Private projects are flagged and shown with a **"Private
+repository"** note instead of a dead public GitHub link, so visitors never hit a 404. Revoke
+or rotate the token any time in GitHub → Settings → Developer settings; the sync silently
+falls back to public-only if it's removed.
+
+> The theme also ships a **curated set of detailed project write-ups** (seeded on
+> activation), so even before the first sync — or with the server offline — every project
+> page is fully fleshed out. The sync refreshes public repos on top of that and leaves your
+> hand-written bodies intact.
 
 ## Adding client work
 

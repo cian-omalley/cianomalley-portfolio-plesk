@@ -182,6 +182,7 @@ function dd_single() {
 	$year    = dd_meta( 'dd_year' );
 	$live    = dd_meta( 'dd_live_url' );
 	$repo    = dd_meta( 'dd_repo_url' );
+	$private = dd_meta( 'dd_private' );
 	$svcs    = dd_meta( 'dd_services' );
 	$terms   = get_the_terms( get_the_ID(), 'tech' );
 	$archive = ( 'client_work' === $type ) ? get_post_type_archive_link( 'client_work' ) : get_post_type_archive_link( 'project' );
@@ -225,6 +226,9 @@ function dd_single() {
 					<?php endif; ?>
 					<?php if ( $terms && ! is_wp_error( $terms ) ) : ?>
 						<div><dt><?php esc_html_e( 'Stack', 'digital-district' ); ?></dt><dd><?php echo esc_html( implode( ', ', wp_list_pluck( $terms, 'name' ) ) ); ?></dd></div>
+					<?php endif; ?>
+					<?php if ( $private && ! $repo ) : ?>
+						<div><dt><?php esc_html_e( 'Source', 'digital-district' ); ?></dt><dd><?php esc_html_e( 'Private repository', 'digital-district' ); ?></dd></div>
 					<?php endif; ?>
 				</dl>
 

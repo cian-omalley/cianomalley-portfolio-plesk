@@ -90,4 +90,5 @@ require get_template_directory() . '/inc/meta-boxes.php';
 require get_template_directory() . '/inc/template-tags.php';
 require get_template_directory() . '/inc/contact.php';
 require get_template_directory() . '/inc/github-sync.php';
+require get_template_directory() . '/inc/projects-data.php';
 require get_template_directory() . '/inc/setup-content.php';
