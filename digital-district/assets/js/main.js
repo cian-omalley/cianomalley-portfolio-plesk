@@ -33,7 +33,11 @@
           }
         });
       },
-      { rootMargin: '0px 0px -10% 0px', threshold: 0.12 }
+      // threshold 0 (not a fraction): a very tall block — e.g. a long
+      // case-study body — can never fit 12% of itself in the viewport, so a
+      // fractional threshold would leave it stuck at opacity 0 forever. Reveal
+      // as soon as any part crosses in; the -10% bottom margin keeps the feel.
+      { rootMargin: '0px 0px -10% 0px', threshold: 0 }
     );
     items.forEach(function (el) { io.observe(el); });
   }
