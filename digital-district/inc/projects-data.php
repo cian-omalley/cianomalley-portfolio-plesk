@@ -34,6 +34,7 @@ function dd_projects_data() {
 		'status'  => 'In Progress',
 		'tech'    => array( 'Go', 'Privacy', 'Cryptography', 'IoT', 'LoRa', 'PWA' ),
 		'year'    => '2026',
+		'repo_id' => 1319057074,
 		'private' => true,
 		'repo'    => '',
 		'body'    => <<<'HTML'
@@ -132,6 +133,7 @@ HTML
 		'status'  => 'In Progress',
 		'tech'    => array( 'PHP', 'WordPress', 'JavaScript', 'CSS' ),
 		'year'    => '2026',
+		'repo_id' => 1307738595,
 		'private' => false,
 		'repo'    => 'https://github.com/cian-omalley/cianomalley-portfolio-plesk',
 		'body'    => <<<'HTML'
@@ -191,6 +193,7 @@ HTML
 		'status'  => 'In Progress',
 		'tech'    => array( 'Python', 'AI', 'Agents', 'Systems' ),
 		'year'    => '2026',
+		'repo_id' => 1306656088,
 		'private' => false,
 		'repo'    => 'https://github.com/cian-omalley/Hermes-Workspace-OS',
 		'body'    => <<<'HTML'
@@ -233,6 +236,7 @@ HTML
 		'status'  => 'In Progress',
 		'tech'    => array( 'Python', 'AI', 'Agents', 'Systems' ),
 		'year'    => '2026',
+		'repo_id' => 1306656088,
 		'private' => true,
 		'repo'    => '',
 		'body'    => <<<'HTML'
@@ -269,6 +273,7 @@ HTML
 		'status'  => 'In Progress',
 		'tech'    => array( 'Docs', 'Architecture' ),
 		'year'    => '2026',
+		'repo_id' => 1294612451,
 		'private' => false,
 		'repo'    => 'https://github.com/cian-omalley/cianomalley-documentation',
 		'body'    => <<<'HTML'
@@ -302,6 +307,7 @@ HTML
 		'status'  => 'In Progress',
 		'tech'    => array( 'PHP', 'WordPress', 'Three.js', 'Frontend' ),
 		'year'    => '2026',
+		'repo_id' => 1294601843,
 		'private' => false,
 		'repo'    => 'https://github.com/cian-omalley/cianomalley-portfolio',
 		'body'    => <<<'HTML'
@@ -334,6 +340,7 @@ HTML
 		'status'  => 'Planning',
 		'tech'    => array( 'Design', 'CSS', 'Tokens' ),
 		'year'    => '2026',
+		'repo_id' => 1294598610,
 		'private' => false,
 		'repo'    => 'https://github.com/cian-omalley/cianomalley-design-system',
 		'body'    => <<<'HTML'
@@ -364,6 +371,7 @@ HTML
 		'status'  => 'In Progress',
 		'tech'    => array( 'Assets', 'Branding' ),
 		'year'    => '2026',
+		'repo_id' => 1294604194,
 		'private' => false,
 		'repo'    => 'https://github.com/cian-omalley/cianomalley-assets',
 		'body'    => <<<'HTML'
@@ -390,6 +398,7 @@ HTML
 		'status'  => 'Planning',
 		'tech'    => array( 'Brand', 'Design' ),
 		'year'    => '2026',
+		'repo_id' => 1294612993,
 		'private' => false,
 		'repo'    => 'https://github.com/cian-omalley/cianomalley-brand',
 		'body'    => <<<'HTML'
@@ -416,6 +425,7 @@ HTML
 		'status'  => 'Complete',
 		'tech'    => array( 'PowerShell', 'Tooling' ),
 		'year'    => '2026',
+		'repo_id' => 1287575210,
 		'private' => false,
 		'repo'    => 'https://github.com/cian-omalley/project-template',
 		'body'    => <<<'HTML'
@@ -442,6 +452,7 @@ HTML
 		'status'  => 'Planning',
 		'tech'    => array( 'Profile', 'Docs' ),
 		'year'    => '2026',
+		'repo_id' => 1286882906,
 		'private' => false,
 		'repo'    => 'https://github.com/cian-omalley/cian-omalley',
 		'body'    => <<<'HTML'
@@ -465,6 +476,7 @@ HTML
 		'status'  => 'Complete',
 		'tech'    => array( 'GitHub', 'Git', 'Learning' ),
 		'year'    => '2026',
+		'repo_id' => 1286874059,
 		'private' => true,
 		'repo'    => '',
 		'body'    => <<<'HTML'

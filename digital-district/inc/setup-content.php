@@ -16,12 +16,18 @@ function dd_after_switch_theme() {
 
 	dd_create_pages();
 
-	// Import every repository from the GitHub account. If the server can't
-	// reach GitHub during activation, fall back to a small honest seed so the
-	// site isn't empty; the owner can re-run the sync from Projects → Sync GitHub.
-	$synced = function_exists( 'dd_sync_github' ) ? dd_sync_github() : 0;
-	if ( is_wp_error( $synced ) || 0 === $synced ) {
-		dd_seed_projects();
+	// Seed the curated, detailed project write-ups first — they are the
+	// authoritative content and carry the hand-written case studies. Each is
+	// tagged with its real GitHub repo id.
+	dd_seed_projects();
+
+	// Then refresh from GitHub: the sync matches curated projects by repo id and
+	// updates them in place (status/excerpt), preserving the curated bodies, and
+	// adds any brand-new public repos. If the server can't reach GitHub during
+	// activation this is simply skipped — the curated set already fills the site;
+	// the owner can re-run it any time from Projects → Sync GitHub.
+	if ( function_exists( 'dd_sync_github' ) ) {
+		dd_sync_github();
 	}
 
 	dd_seed_guides();
@@ -361,6 +367,12 @@ function dd_seed_projects() {
 		update_post_meta( $id, 'dd_status', $p['status'] );
 		update_post_meta( $id, 'dd_year', $p['year'] );
 		update_post_meta( $id, 'dd_private', ! empty( $p['private'] ) ? '1' : '' );
+		if ( ! empty( $p['repo_id'] ) ) {
+			// Store the real GitHub repo id so a later sync updates this curated
+			// project in place (refreshing status/excerpt) instead of creating a
+			// duplicate, and preserves the hand-written body.
+			update_post_meta( $id, 'dd_repo_id', (int) $p['repo_id'] );
+		}
 		if ( ! empty( $p['repo'] ) ) {
 			update_post_meta( $id, 'dd_repo_url', esc_url_raw( $p['repo'] ) );
 		}

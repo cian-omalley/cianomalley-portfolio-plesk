@@ -343,16 +343,22 @@ function dd_sync_github() {
 		$desc = isset( $repo['description'] ) ? (string) $repo['description'] : '';
 
 		$data = array(
-			'post_type'    => 'project',
-			'post_status'  => 'publish',
-			'post_excerpt' => $desc,
+			'post_type'   => 'project',
+			'post_status' => 'publish',
 		);
 
 		if ( $post_id ) {
-			// Preserve manual title/content edits; refresh excerpt only.
+			// Existing (curated or previously-synced) project: preserve the
+			// hand-written title and body. Only refresh the excerpt when the repo
+			// actually has a description, so a blank GitHub description never wipes
+			// a curated excerpt.
 			$data['ID'] = $post_id;
-			$post_id    = wp_update_post( $data, true );
+			if ( '' !== $desc ) {
+				$data['post_excerpt'] = $desc;
+			}
+			$post_id = wp_update_post( $data, true );
 		} else {
+			$data['post_excerpt'] = $desc;
 			// Pull the repo README for a detailed body; if there isn't one,
 			// generate a full breakdown from the repo metadata so every project
 			// page carries a real explanation, not a one-liner.
@@ -387,13 +393,18 @@ function dd_sync_github() {
 			update_post_meta( $post_id, 'dd_status', dd_github_status( $repo ) );
 		}
 
-		// Technologies: language + topics.
-		$terms = array();
-		if ( ! empty( $repo['language'] ) ) {
-			$terms[] = $repo['language'];
-		}
-		if ( ! empty( $repo['topics'] ) && is_array( $repo['topics'] ) ) {
-			$terms = array_merge( $terms, array_slice( $repo['topics'], 0, 5 ) );
+		// Technologies: language + topics. Only assign when the project has no
+		// tech terms yet, so a curated project's richer, hand-picked stack tags
+		// aren't clobbered down to just the repo's primary language.
+		$existing_terms = wp_get_object_terms( $post_id, 'tech', array( 'fields' => 'ids' ) );
+		$terms          = array();
+		if ( empty( $existing_terms ) || is_wp_error( $existing_terms ) ) {
+			if ( ! empty( $repo['language'] ) ) {
+				$terms[] = $repo['language'];
+			}
+			if ( ! empty( $repo['topics'] ) && is_array( $repo['topics'] ) ) {
+				$terms = array_merge( $terms, array_slice( $repo['topics'], 0, 5 ) );
+			}
 		}
 		if ( $terms ) {
 			wp_set_object_terms( $post_id, $terms, 'tech', false );
