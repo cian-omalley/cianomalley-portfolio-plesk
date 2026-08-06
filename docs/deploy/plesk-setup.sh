@@ -34,10 +34,10 @@ mkbox(){ # addr pass
 }
 mkfwd(){ # addr target
   if $PLESK mail --info "$1" >/dev/null 2>&1; then
-    $PLESK mail --update "$1" -mailbox false -forwarding true -forwarding-addresses "$2" >/dev/null 2>&1 \
+    $PLESK mail --update "$1" -mailbox false -forwarding true -forwarding-addresses "set:$2" >/dev/null 2>&1 \
       && echo "  fwd (upd): $1 -> $2" || echo "  !! set forward $1 -> $2 in UI"
   else
-    $PLESK mail --create "$1" -mailbox false -forwarding true -forwarding-addresses "$2" \
+    $PLESK mail --create "$1" -mailbox false -forwarding true -forwarding-addresses "set:$2" \
       && echo "  fwd: $1 -> $2" || echo "  !! create forward $1 -> $2 in UI"
   fi
 }
