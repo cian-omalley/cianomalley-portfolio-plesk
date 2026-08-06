@@ -26,7 +26,7 @@ www             IN  CNAME   cianomalley.dev.
 _dmarc          IN  TXT     "v=DMARC1; p=none; rua=mailto:dmarc@cianomalley.dev; adkim=s; aspf=s; pct=100"
 ;; default._domainkey  IN  TXT  "v=DKIM1; k=rsa; p=..."   <- paste from plesk-setup.sh (.dev)
 
-;; --- project demos (uncomment / duplicate as you publish each one) ---
-;; portfolio-demo  IN  CNAME  cianomalley.dev.
-;; ai-os           IN  CNAME  cianomalley.dev.
-;; safepulse       IN  CNAME  cianomalley.dev.
+;; --- project demos (uncomment each after you create its Plesk subdomain + SSL) ---
+;; safepulse     IN  CNAME  cianomalley.dev.
+;; hermes        IN  CNAME  cianomalley.dev.
+;; captain-claw  IN  CNAME  cianomalley.dev.

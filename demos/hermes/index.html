@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hermes Workspace OS — orchestration demo</title>
+<style>
+  :root{--void:#05060A;--surface:#0b0e16;--surface2:#121726;--ink:#eaf0ff;--muted:#8a93ab;
+    --acid:#CCFF00;--violet:#7C3AED;--magenta:#FF2E88;--cyan:#22D3EE;--hair:1px solid #1c2233;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Space Grotesk",system-ui,sans-serif;color:var(--ink);min-height:100vh;
+    background:radial-gradient(1000px 500px at 90% -10%,rgba(34,211,238,.18),transparent),
+    radial-gradient(900px 500px at -10% 110%,rgba(124,58,237,.22),transparent),var(--void)}
+  .wrap{max-width:1040px;margin:0 auto;padding:28px 20px 60px}
+  .tag{font-family:ui-monospace,monospace;font-size:.72rem;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase}
+  h1{font-size:clamp(1.8rem,6vw,3rem);margin:.2em 0 0}
+  h1 .n{background:linear-gradient(90deg,var(--cyan),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--muted);max-width:64ch;margin:.6em 0 0}
+  .note{display:inline-block;margin-top:14px;font-family:ui-monospace,monospace;font-size:.7rem;color:var(--acid);border:1px dashed #2a3350;padding:6px 10px;border-radius:6px}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:24px 0 18px}
+  button.run{font:inherit;font-weight:700;background:var(--acid);color:var(--void);border:none;border-radius:10px;padding:11px 18px;cursor:pointer;box-shadow:0 0 20px rgba(204,255,0,.35)}
+  button.run:disabled{opacity:.5;box-shadow:none;cursor:default}
+  .status{font-family:ui-monospace,monospace;font-size:.78rem;color:var(--cyan)}
+  .grid{display:grid;gap:16px;grid-template-columns:1fr}
+  @media(min-width:800px){.grid{grid-template-columns:1fr 1fr 1fr}}
+  .panel{background:linear-gradient(180deg,var(--surface),#080b12);border:var(--hair);border-radius:14px;padding:16px;min-height:220px}
+  .panel h3{margin:0 0 10px;font-size:.82rem;font-family:ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .item{display:flex;align-items:center;gap:9px;font-size:.86rem;padding:8px 10px;border:var(--hair);border-radius:9px;margin-bottom:8px;background:var(--surface2);transition:.25s}
+  .item .dot{width:8px;height:8px;border-radius:50%;background:#2a3350;flex:none}
+  .item.active{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan) inset} .item.active .dot{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+  .item.done .dot{background:var(--acid)}
+  .mem{font-size:.8rem;color:var(--muted);border-left:2px solid var(--violet);padding:6px 10px;margin-bottom:7px;border-radius:6px;background:#0a0d15;animation:in .3s ease}
+  .mem b{color:var(--ink)}
+  .task{font-size:.84rem;padding:9px 11px;border-radius:9px;margin-bottom:8px;border:var(--hair);display:flex;justify-content:space-between;align-items:center}
+  .task .s{font-family:ui-monospace,monospace;font-size:.66rem;color:var(--muted)}
+  .task.run{border-color:var(--cyan)} .task.run .s{color:var(--cyan)}
+  .task.ok{opacity:.7} .task.ok .s{color:var(--acid)}
+  @keyframes in{from{opacity:0;transform:translateX(-6px)}}
+  .log{margin-top:16px;font-family:ui-monospace,monospace;font-size:.74rem;color:var(--muted);background:#070a11;border:var(--hair);border-radius:12px;padding:12px 14px;min-height:70px}
+  .log div{padding:2px 0} .log .c{color:var(--cyan)} .log .a{color:var(--acid)} .log .v{color:#b794f6}
+  footer{margin-top:34px;color:var(--muted);font-size:.75rem;border-top:var(--hair);padding-top:16px}
+  a{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="tag">// agent-driven workspace · orchestration demo</p>
+  <h1>Hermes <span class="n">Workspace OS</span></h1>
+  <p class="lede">The layer that turns a chatbot into a colleague: a catalogue of <b>tools</b>, a durable <b>memory</b>, and a <b>task</b> loop that plans, acts and resumes. Press run to watch the orchestration loop pick a tool, read &amp; write memory, and complete a task.</p>
+  <span class="note">DEMO — a visual mock of the loop; the real system is a Python codebase.</span>
+
+  <div class="bar">
+    <button class="run" id="run">▶ Run next task</button>
+    <button class="run" id="auto" style="background:var(--violet);color:#fff;box-shadow:0 0 20px rgba(124,58,237,.4)">⟳ Auto</button>
+    <span class="status" id="status">idle — 3 tasks queued</span>
+  </div>
+
+  <div class="grid">
+    <div class="panel"><h3>Tools</h3><div id="tools"></div></div>
+    <div class="panel"><h3>Memory (persists between runs)</h3><div id="memory"><div class="mem">Empty — nothing learned yet.</div></div></div>
+    <div class="panel"><h3>Tasks</h3><div id="tasks"></div></div>
+  </div>
+
+  <div class="log" id="log"><div>orchestration log</div></div>
+
+  <footer>Hermes Workspace OS · <a href="https://github.com/cian-omalley/Hermes-Workspace-OS" rel="noopener">github.com/cian-omalley/Hermes-Workspace-OS</a> · concept demo.</footer>
+</div>
+
+<script>
+(function(){
+  var TOOLS=[{n:'web.search',t:'fetch'},{n:'files.read',t:'io'},{n:'code.run',t:'exec'},{n:'notify.send',t:'io'}];
+  var TASKS=[
+    {name:'Summarise the weekly repo activity',tool:'web.search',learn:'12 commits across 4 repos this week'},
+    {name:'Draft release notes from the diff',tool:'files.read',learn:'v1.1 focus: mail + demos'},
+    {name:'Schedule the deploy reminder',tool:'notify.send',learn:'reminder set for Fri 17:00'}
+  ];
+  var toolsEl=document.getElementById('tools'),memEl=document.getElementById('memory'),tasksEl=document.getElementById('tasks'),
+      logEl=document.getElementById('log'),statusEl=document.getElementById('status'),runBtn=document.getElementById('run'),autoBtn=document.getElementById('auto');
+  TOOLS.forEach(function(t){var d=document.createElement('div');d.className='item';d.dataset.n=t.n;
+    d.innerHTML='<span class="dot"></span><b>'+t.n+'</b> <span style="color:var(--muted);font-size:.72rem;margin-left:auto">'+t.t+'</span>';toolsEl.appendChild(d);});
+  var taskEls=TASKS.map(function(t,i){var d=document.createElement('div');d.className='task';
+    d.innerHTML='<span>'+t.name+'</span><span class="s">queued</span>';tasksEl.appendChild(d);return d;});
+  var idx=0, busy=false, learned=false;
+  function log(html){var d=document.createElement('div');d.innerHTML=html;logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;}
+  function wait(ms){return new Promise(function(r){setTimeout(r,ms);});}
+  async function runOne(){
+    if(busy) return; if(idx>=TASKS.length){statusEl.textContent='all tasks complete ✓';return;}
+    busy=true; runBtn.disabled=true;
+    var task=TASKS[idx], te=taskEls[idx], tool=document.querySelector('.item[data-n="'+task.tool+'"]');
+    te.classList.add('run'); te.querySelector('.s').textContent='running';
+    statusEl.textContent='running: '+task.name;
+    log('▸ task <span class="a">'+task.name+'</span>');
+    await wait(500);
+    log('  ↳ call tool <span class="c">'+task.tool+'()</span>'); tool.classList.add('active');
+    await wait(750);
+    if(learned) log('  ↳ read memory <span class="v">✓ prior context</span>');
+    tool.classList.remove('active'); tool.classList.add('done');
+    log('  ↳ write memory <span class="v">'+task.learn+'</span>');
+    if(learned===false){memEl.innerHTML='';learned=true;}
+    var m=document.createElement('div');m.className='mem';m.innerHTML='<b>'+task.tool+'</b> → '+task.learn;memEl.appendChild(m);
+    await wait(500);
+    te.classList.remove('run');te.classList.add('ok');te.querySelector('.s').textContent='done ✓';
+    log('  ↳ <span class="a">done</span>');
+    idx++; busy=false; runBtn.disabled=false;
+    statusEl.textContent=idx>=TASKS.length?'all tasks complete ✓ — memory retained':(TASKS.length-idx)+' task(s) queued';
+    setTimeout(function(){tool.classList.remove('done');},1200);
+  }
+  runBtn.onclick=runOne;
+  autoBtn.onclick=async function(){autoBtn.disabled=true;while(idx<TASKS.length){await runOne();await wait(700);}autoBtn.disabled=false;};
+})();
+</script>
+</body>
+</html>

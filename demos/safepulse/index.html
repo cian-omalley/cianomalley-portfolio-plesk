@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SafePulse — Awareness Mesh (concept demo)</title>
+<style>
+  :root{--void:#05060A;--surface:#0b0e16;--surface2:#121726;--ink:#eaf0ff;--muted:#8a93ab;
+    --acid:#CCFF00;--violet:#7C3AED;--magenta:#FF2E88;--cyan:#22D3EE;--hair:1px solid #1c2233;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Space Grotesk",system-ui,sans-serif;background:
+    radial-gradient(1200px 600px at 80% -10%,rgba(124,58,237,.25),transparent),
+    radial-gradient(1000px 500px at -10% 110%,rgba(255,46,136,.18),transparent),var(--void);
+    color:var(--ink);min-height:100vh}
+  .wrap{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
+  .tag{font-family:ui-monospace,monospace;font-size:.72rem;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase}
+  h1{font-size:clamp(1.8rem,6vw,3rem);margin:.2em 0 0;line-height:1.02}
+  h1 .n{background:linear-gradient(90deg,var(--violet),var(--magenta),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--muted);max-width:60ch;margin:.6em 0 0}
+  .note{display:inline-block;margin-top:14px;font-family:ui-monospace,monospace;font-size:.7rem;color:var(--acid);border:1px dashed #2a3350;padding:6px 10px;border-radius:6px}
+  .grid{display:grid;gap:22px;grid-template-columns:1fr;margin-top:30px}
+  @media(min-width:820px){.grid{grid-template-columns:320px 1fr}}
+  .card{background:linear-gradient(180deg,var(--surface),#080b12);border:var(--hair);border-radius:16px;padding:20px}
+  .phone{max-width:300px;margin:0 auto;text-align:center}
+  .zone{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--muted);margin-bottom:8px}
+  .zone b{color:var(--cyan)}
+  .sos{position:relative;width:200px;height:200px;border-radius:50%;margin:14px auto;border:none;cursor:pointer;
+    background:radial-gradient(circle at 50% 40%,#ff4d94,#c9185f);color:#fff;font-weight:800;font-size:1.3rem;letter-spacing:.08em;
+    box-shadow:0 0 0 0 rgba(255,46,136,.6),0 10px 40px rgba(255,46,136,.35);transition:transform .1s}
+  .sos:active{transform:scale(.97)}
+  .ring{position:absolute;inset:-6px;border-radius:50%;pointer-events:none}
+  .ring circle{fill:none;stroke:var(--acid);stroke-width:6;stroke-linecap:round;
+    stroke-dasharray:603;stroke-dashoffset:603;transform:rotate(-90deg);transform-origin:50% 50%;filter:drop-shadow(0 0 6px var(--acid))}
+  .hint{font-size:.78rem;color:var(--muted);margin-top:4px}
+  select{width:100%;background:var(--surface2);color:var(--ink);border:var(--hair);border-radius:8px;padding:9px;font:inherit;margin-top:6px}
+  .tiers{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+  .tier{font-family:ui-monospace,monospace;font-size:.62rem;padding:4px 7px;border-radius:6px;border:var(--hair);color:var(--muted)}
+  .tier.on{color:var(--void);background:var(--acid);border-color:var(--acid);font-weight:700}
+  .board h3{margin:0 0 4px;font-size:1rem}
+  .cols{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+  @media(min-width:520px){.cols{grid-template-columns:repeat(4,1fr)}}
+  .team{background:var(--surface2);border:var(--hair);border-radius:10px;padding:10px;min-height:120px}
+  .team .t{font-family:ui-monospace,monospace;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .team.aware .t{color:var(--cyan)} .team.med .t{color:#34d399} .team.sec .t{color:var(--magenta)} .team.org .t{color:var(--acid)}
+  .inc{font-size:.72rem;background:#0a0d15;border-left:2px solid var(--cyan);padding:6px 8px;border-radius:6px;margin-top:8px;animation:pop .35s ease}
+  .team.med .inc{border-color:#34d399}.team.sec .inc{border-color:var(--magenta)}.team.org .inc{border-color:var(--acid)}
+  @keyframes pop{from{opacity:0;transform:translateY(-6px)}}
+  .legend{font-size:.72rem;color:var(--muted);margin-top:12px;line-height:1.6}
+  .kind{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+  .kind button{font:inherit;font-size:.72rem;background:var(--surface2);color:var(--ink);border:var(--hair);border-radius:20px;padding:6px 12px;cursor:pointer}
+  .kind button.sel{border-color:var(--magenta);color:var(--magenta)}
+  footer{margin-top:36px;color:var(--muted);font-size:.75rem;border-top:var(--hair);padding-top:16px}
+  a{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="tag">// Awareness Mesh · concept demo</p>
+  <h1>Safe<span class="n">Pulse</span></h1>
+  <p class="lede">Privacy-first, offline-capable event safety. Hold the button for help — the request seals, finds a live transport, and reaches <em>one</em> team. Nobody is tracked. This is an interactive mock of the real flow.</p>
+  <span class="note">DEMO — mock data, no network. The real system runs a Go gateway on-venue.</span>
+
+  <div class="grid">
+    <!-- Guest phone -->
+    <div class="card phone">
+      <div class="zone">Zone: <b id="zone">Main Floor · Left</b></div>
+      <select id="zonesel" aria-label="Zone">
+        <option>Main Floor · Left</option><option>Main Floor · Right</option>
+        <option>Bar · North</option><option>Chill Room</option><option>Outdoor · Stage B</option>
+      </select>
+      <div class="kind" id="kinds">
+        <button data-k="welfare" data-team="aware" class="sel">Welfare</button>
+        <button data-k="medical" data-team="med">Medical</button>
+        <button data-k="threat"  data-team="sec">Threat</button>
+      </div>
+      <button class="sos" id="sos">
+        HOLD<br>FOR HELP
+        <svg class="ring" viewBox="0 0 200 200"><circle id="prog" cx="100" cy="100" r="96"/></svg>
+      </button>
+      <div class="hint" id="hint">Press &amp; hold 2 seconds</div>
+      <div class="tiers" id="tiers">
+        <span class="tier">Internet</span><span class="tier">Wi-Fi</span>
+        <span class="tier">Relay mesh</span><span class="tier">LoRa</span><span class="tier">QR sign</span>
+      </div>
+    </div>
+
+    <!-- Staff dashboard -->
+    <div class="card board">
+      <h3>Staff dashboard <span style="color:var(--muted);font-weight:400;font-size:.8rem">· role-segregated, deny by default</span></h3>
+      <div class="cols">
+        <div class="team aware"><div class="t">Awareness</div><div id="aware"></div></div>
+        <div class="team med"><div class="t">Medical</div><div id="med"></div></div>
+        <div class="team sec"><div class="t">Security</div><div id="sec"></div></div>
+        <div class="team org"><div class="t">Organizer</div><div id="org"></div></div>
+      </div>
+      <div class="legend">
+        Welfare → Awareness · Triage → Medical · Threats → Security (+Awareness) · Organizer sees <em>counts only</em>.
+        The gateway holds the only key; relays forward opaque ciphertext. Data self-deletes 24–72h after the event.
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    SafePulse — the Awareness Mesh · <a href="https://github.com/cian-omalley" rel="noopener">github.com/cian-omalley</a> · concept demo, not the production build.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var sos=document.getElementById('sos'),prog=document.getElementById('prog'),hint=document.getElementById('hint');
+  var C=603, held=0, raf, t0, kind='welfare', team='aware', org=0;
+  document.getElementById('zonesel').onchange=function(e){document.getElementById('zone').textContent=e.target.value;};
+  document.querySelectorAll('#kinds button').forEach(function(b){b.onclick=function(){
+    document.querySelectorAll('#kinds button').forEach(function(x){x.classList.remove('sel');});
+    b.classList.add('sel'); kind=b.dataset.k; team=b.dataset.team;};});
+  function set(off){prog.style.strokeDashoffset=off;}
+  function frame(){var p=Math.min(1,(performance.now()-t0)/2000); set(C*(1-p));
+    if(p<1){raf=requestAnimationFrame(frame);} else {fire();}}
+  function start(e){e.preventDefault(); t0=performance.now(); hint.textContent='Sealing…'; raf=requestAnimationFrame(frame);}
+  function cancel(){cancelAnimationFrame(raf); set(C); if(hint.textContent==='Sealing…') hint.textContent='Press & hold 2 seconds';}
+  function lightTiers(){var tiers=document.querySelectorAll('.tier');tiers.forEach(function(t){t.classList.remove('on');});
+    var i=0; (function step(){ if(i>0) tiers[i-1].classList.remove('on'); if(i<tiers.length){tiers[i].classList.add('on'); i++; setTimeout(step,180);} else {tiers[Math.max(0,tiers.length-3)].classList.add('on');}})();}
+  function fire(){
+    cancelAnimationFrame(raf); hint.textContent='✓ Help is coming — signed receipt received'; set(C);
+    lightTiers();
+    var zone=document.getElementById('zone').textContent;
+    var msg={welfare:'Welfare check',medical:'Medical triage',threat:'Physical threat'}[kind];
+    var box=document.getElementById(team);
+    var el=document.createElement('div'); el.className='inc';
+    el.innerHTML='<b>'+msg+'</b> · '+zone+' · now';
+    box.prepend(el);
+    if(kind==='threat'){ // threats also go to Awareness
+      var a=document.createElement('div'); a.className='inc'; a.innerHTML='<b>Threat (routed)</b> · '+zone;
+      document.getElementById('aware').prepend(a);
+    }
+    org++; document.getElementById('org').innerHTML='<div class="inc"><b>'+org+'</b> incident'+(org>1?'s':'')+' this hour<br><span style="color:#8a93ab">counts only — no identities</span></div>';
+    setTimeout(function(){hint.textContent='Press & hold 2 seconds';},2600);
+  }
+  sos.addEventListener('mousedown',start); sos.addEventListener('touchstart',start,{passive:false});
+  ['mouseup','mouseleave','touchend','touchcancel'].forEach(function(ev){sos.addEventListener(ev,cancel);});
+  set(C);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Captain Claw — playable demo</title>
+<style>
+  :root{--void:#05060A;--ink:#eaf0ff;--muted:#8a93ab;--acid:#CCFF00;--violet:#7C3AED;--magenta:#FF2E88;--cyan:#22D3EE;--hair:1px solid #1c2233;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Space Grotesk",system-ui,sans-serif;color:var(--ink);min-height:100vh;
+    background:radial-gradient(1000px 500px at 80% -10%,rgba(255,46,136,.2),transparent),
+    radial-gradient(900px 500px at -10% 110%,rgba(34,211,238,.16),transparent),var(--void);
+    display:flex;flex-direction:column;align-items:center;padding:22px 14px 50px}
+  .tag{font-family:ui-monospace,monospace;font-size:.72rem;letter-spacing:.22em;color:var(--cyan);text-transform:uppercase}
+  h1{font-size:clamp(1.7rem,6vw,2.8rem);margin:.2em 0 .1em}
+  h1 .n{background:linear-gradient(90deg,var(--magenta),var(--acid));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .note{font-family:ui-monospace,monospace;font-size:.7rem;color:var(--acid);border:1px dashed #2a3350;padding:6px 10px;border-radius:6px;margin:6px 0 16px;max-width:60ch;text-align:center}
+  .stage{position:relative;width:min(760px,96vw);aspect-ratio:2/1;border:var(--hair);border-radius:16px;overflow:hidden;box-shadow:0 0 40px rgba(124,58,237,.25)}
+  canvas{display:block;width:100%;height:100%;background:linear-gradient(180deg,#0a0e1a,#05060A)}
+  .hud{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;font-family:ui-monospace,monospace;font-size:.8rem;color:var(--muted)}
+  .hud b{color:var(--acid)}
+  .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(5,6,10,.72);backdrop-filter:blur(2px);text-align:center;padding:16px}
+  .overlay.hide{display:none}
+  .overlay h2{margin:0;font-size:1.4rem}
+  .overlay p{margin:0;color:var(--muted);font-size:.9rem}
+  .btn{font:inherit;font-weight:700;background:var(--acid);color:var(--void);border:none;border-radius:10px;padding:11px 20px;cursor:pointer;box-shadow:0 0 20px rgba(204,255,0,.35)}
+  .hint{color:var(--muted);font-size:.78rem;margin-top:14px}
+  footer{margin-top:24px;color:var(--muted);font-size:.75rem}
+  a{color:var(--cyan)}
+</style>
+</head>
+<body>
+  <p class="tag">// playable placeholder demo</p>
+  <h1>Captain <span class="n">Claw</span></h1>
+  <div class="note">PLACEHOLDER — a stand-in mini-game so the subdomain isn't empty. Tell Cian what Captain Claw really is and it gets rebuilt for real.</div>
+
+  <div class="stage">
+    <div class="hud"><span>SCORE <b id="score">0</b></span><span>BEST <b id="best">0</b></span></div>
+    <canvas id="c" width="760" height="380"></canvas>
+    <div class="overlay" id="ov">
+      <h2 id="ovh">Captain Claw</h2>
+      <p id="ovp">Jump the neon crates. Tap / Space / ↑ to jump.</p>
+      <button class="btn" id="start">▶ Play</button>
+    </div>
+  </div>
+  <p class="hint">Tap the stage, press <b>Space</b>, or <b>↑</b> to jump. Avoid the crates.</p>
+  <footer>Captain Claw · concept demo · <a href="https://github.com/cian-omalley" rel="noopener">github.com/cian-omalley</a></footer>
+
+<script>
+(function(){
+  var c=document.getElementById('c'),x=c.getContext('2d'),W=760,H=380,ground=H-56;
+  var scoreEl=document.getElementById('score'),bestEl=document.getElementById('best'),
+      ov=document.getElementById('ov'),ovh=document.getElementById('ovh'),ovp=document.getElementById('ovp'),startBtn=document.getElementById('start');
+  var best=+(localStorage.getItem('cc_best')||0); bestEl.textContent=best;
+  var p,obs,score,speed,running,tPrev,spawn;
+  function reset(){p={x:90,y:ground,vy:0,r:18,onGround:true};obs=[];score=0;speed=5;running=true;spawn=0;tPrev=performance.now();ov.classList.add('hide');loop(tPrev);}
+  function jump(){if(!running)return;if(p.onGround){p.vy=-13.2;p.onGround=false;}}
+  function gameOver(){running=false;best=Math.max(best,Math.floor(score));localStorage.setItem('cc_best',best);bestEl.textContent=best;
+    ovh.textContent='Game over';ovp.textContent='Score '+Math.floor(score)+' · press Play to run again';startBtn.textContent='▶ Play again';ov.classList.remove('hide');}
+  function rr(x0,y0,w,h,r){x.beginPath();x.moveTo(x0+r,y0);x.arcTo(x0+w,y0,x0+w,y0+h,r);x.arcTo(x0+w,y0+h,x0,y0+h,r);x.arcTo(x0,y0+h,x0,y0,r);x.arcTo(x0,y0,x0+w,y0,r);x.closePath();}
+  function loop(t){
+    if(!running)return; var dt=Math.min(40,t-tPrev); tPrev=t; requestAnimationFrame(loop);
+    score+=dt*0.012; speed+=dt*0.00035; scoreEl.textContent=Math.floor(score);
+    p.vy+=0.62; p.y+=p.vy; if(p.y>=ground){p.y=ground;p.vy=0;p.onGround=true;}
+    spawn-=dt; if(spawn<=0){var hgt=26+Math.random()*34;obs.push({x:W+20,w:20+Math.random()*22,h:hgt});spawn=620/speed*(0.7+Math.random());}
+    for(var i=obs.length-1;i>=0;i--){obs[i].x-=speed*dt/16; if(obs[i].x+obs[i].w<0)obs.splice(i,1);}
+    // draw
+    x.clearRect(0,0,W,H);
+    x.strokeStyle='rgba(124,58,237,.25)';x.lineWidth=1;for(var gx=(t*0.05)%40;gx<W;gx+=40){x.beginPath();x.moveTo(gx,0);x.lineTo(gx,H);x.stroke();}
+    x.fillStyle='#0e1322';x.fillRect(0,ground+18,W,H-ground);
+    x.strokeStyle='#22D3EE';x.globalAlpha=.6;x.beginPath();x.moveTo(0,ground+18);x.lineTo(W,ground+18);x.stroke();x.globalAlpha=1;
+    // player (claw)
+    x.save();x.translate(p.x,p.y);
+    x.fillStyle='#FF2E88';x.shadowColor='#FF2E88';x.shadowBlur=14;rr(-p.r,-p.r,p.r*2,p.r*2,7);x.fill();x.shadowBlur=0;
+    x.fillStyle='#05060A';x.fillRect(2,-8,5,5);x.fillRect(9,-8,5,5); // eyes
+    x.strokeStyle='#CCFF00';x.lineWidth=3;x.beginPath();x.moveTo(-p.r,6);x.lineTo(-p.r-8,12);x.moveTo(-p.r,10);x.lineTo(-p.r-6,16);x.stroke(); // claw
+    x.restore();
+    // obstacles
+    for(var j=0;j<obs.length;j++){var o=obs[j];x.fillStyle='#121726';x.strokeStyle='#CCFF00';x.lineWidth=2;
+      rr(o.x,ground+18-o.h,o.w,o.h,4);x.fill();x.stroke();
+      if(p.x+p.r-4>o.x && p.x-p.r+4<o.x+o.w && p.y+p.r-4>ground+18-o.h){gameOver();}}
+  }
+  function press(e){e.preventDefault();if(!running&&ov.classList.contains('hide')===false){return;}jump();}
+  document.addEventListener('keydown',function(e){if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump();}});
+  c.addEventListener('mousedown',function(e){e.preventDefault();jump();});
+  c.addEventListener('touchstart',function(e){e.preventDefault();jump();},{passive:false});
+  startBtn.onclick=reset;
+})();
+</script>
+</body>
+</html>
