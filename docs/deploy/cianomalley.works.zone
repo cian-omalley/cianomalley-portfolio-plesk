@@ -1,0 +1,37 @@
+;; ===========================================================================
+;; Cloudflare DNS zone  —  cianomalley.works   (PLACEHOLDER copy for the repo)
+;; ---------------------------------------------------------------------------
+;; Import:  Cloudflare dashboard > cianomalley.works > DNS > Records > Import
+;;          (upload this file, or paste it in the "Import DNS records" box)
+;;
+;; BEFORE importing:
+;;   - Replace <IPv4> and <IPv6> with your real IONOS IPs.
+;;   - If IPv6 is not yet verified on the server, DELETE the two AAAA lines and
+;;     drop "ip6:<IPv6>" from the SPF record.
+;;
+;; AFTER importing — set proxy status (BIND files can't carry the orange/grey flag):
+;;   @  and  www          -> DNS only (grey) until Let's Encrypt is issued in Plesk,
+;;                           then switch to Proxied (orange).
+;;   server, mail, webmail -> DNS only (grey) ALWAYS. Never proxy mail.
+;;   Then: Cloudflare > SSL/TLS > Overview -> Full (strict).
+;;
+;; DKIM: run docs/deploy/plesk-setup.sh first — it prints the exact
+;;       default._domainkey TXT record to add here. Do NOT invent the key.
+;; ===========================================================================
+
+$TTL 300
+
+@               IN  A       <IPv4>
+@               IN  AAAA    <IPv6>
+www             IN  CNAME   cianomalley.works.
+
+server          IN  A       <IPv4>
+server          IN  AAAA    <IPv6>
+mail            IN  CNAME   server.cianomalley.works.
+webmail         IN  CNAME   server.cianomalley.works.
+
+@               IN  MX  10  server.cianomalley.works.
+@               IN  TXT     "v=spf1 a:server.cianomalley.works mx ip4:<IPv4> ip6:<IPv6> ~all"
+_dmarc          IN  TXT     "v=DMARC1; p=none; rua=mailto:dmarc@cianomalley.works; adkim=s; aspf=s; pct=100"
+
+;; default._domainkey  IN  TXT  "v=DKIM1; k=rsa; p=..."   <- paste from plesk-setup.sh output

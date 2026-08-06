@@ -1,0 +1,24 @@
+;; ===========================================================================
+;; Cloudflare DNS zone  —  cianomalley.dev   (PLACEHOLDER copy for the repo)
+;; ---------------------------------------------------------------------------
+;; Import:  Cloudflare dashboard > cianomalley.dev > DNS > Records > Import
+;;
+;; BEFORE importing: replace <IPv4>/<IPv6>. Delete AAAA if IPv6 isn't verified.
+;; AFTER importing:
+;;   @ and www -> DNS only (grey) until Let's Encrypt is issued, then Proxied.
+;;   SSL/TLS > Overview -> Full (strict).
+;;
+;; Demos: add ONE CNAME per project demo (no wildcard initially). Proxy them
+;;        (orange) only after their subdomain has an SSL cert in Plesk.
+;; ===========================================================================
+
+$TTL 300
+
+@               IN  A       <IPv4>
+@               IN  AAAA    <IPv6>
+www             IN  CNAME   cianomalley.dev.
+
+;; --- project demos (uncomment / duplicate as you publish each one) ---
+;; portfolio-demo  IN  CNAME  cianomalley.dev.
+;; ai-os           IN  CNAME  cianomalley.dev.
+;; safepulse       IN  CNAME  cianomalley.dev.

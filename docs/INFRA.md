@@ -16,7 +16,7 @@ source of truth for hostnames, firewall rules, and DNS records.
 | | |
 |---|---|
 | **Provider** | IONOS Cloud (VPS) |
-| **OS / panel** | Ubuntu 24.04 + Plesk (already installed — do **not** reinstall) |
+| **OS / panel** | Debian + Plesk (already installed — do **not** reinstall) |
 | **Disk** | 480 GB NVMe (no Block Storage needed) |
 | **Registrar** | Name.com |
 | **Authoritative DNS** | Cloudflare (Free plan) |
@@ -45,6 +45,10 @@ outbound SMTP (port 25) is unblocked.
 ---
 
 ## IONOS firewall (external) — inbound rules
+> ✅ **Confirmed done** — policy `fw-cian-prod-web-01` is Active with exactly these
+> Allow rules (22, 80, 443, 8443, 25, 587, 465, 993). 8447 is optional (only for
+> the Plesk installer; open it temporarily if component installs fail).
+
 **Open:**
 | Port | Proto | Source | Purpose |
 |---|---|---|---|

@@ -30,3 +30,6 @@ Thumbs.db
 
 # packaged theme (build with ./package.sh)
 digital-district.zip
+
+# real-value deploy files (IPs, passwords) — never commit; public repo
+local/
