@@ -120,3 +120,28 @@ function dd_save_details( $post_id ) {
 	}
 }
 add_action( 'save_post', 'dd_save_details' );
+
+/**
+ * Expose the Details fields to the REST API so they can be read and written
+ * programmatically (e.g. with an Application Password) as well as through the
+ * meta box. Writes require the edit_posts capability and are sanitised; URL
+ * fields use esc_url_raw, everything else sanitize_text_field.
+ */
+function dd_register_meta_for_rest() {
+	$auth = static function () {
+		return current_user_can( 'edit_posts' );
+	};
+	foreach ( dd_fields() as $type => $fields ) {
+		foreach ( $fields as $key => $conf ) {
+			$is_url = ( isset( $conf['type'] ) && 'url' === $conf['type'] );
+			register_post_meta( $type, $key, array(
+				'type'              => 'string',
+				'single'            => true,
+				'show_in_rest'      => true,
+				'sanitize_callback' => $is_url ? 'esc_url_raw' : 'sanitize_text_field',
+				'auth_callback'     => $auth,
+			) );
+		}
+	}
+}
+add_action( 'init', 'dd_register_meta_for_rest' );
