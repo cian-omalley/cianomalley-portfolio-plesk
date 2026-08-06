@@ -15,9 +15,11 @@ source of truth for hostnames, firewall rules, and DNS records.
 ## At a glance
 | | |
 |---|---|
-| **Provider** | IONOS Cloud (VPS) |
-| **OS / panel** | Debian + Plesk (already installed — do **not** reinstall) |
+| **Provider** | IONOS Cloud (VPS), server `cian-prod-web-01`, AMD EPYC-Milan 8 cores |
+| **OS / panel** | **Debian 13.6** + **Plesk Obsidian 18.0.80** (already installed — do **not** reinstall) |
 | **Disk** | 480 GB NVMe (no Block Storage needed) |
+| **IPs** | IPv4 + IPv6 `…/80` assigned & active — **reverse DNS (PTR) not yet set** (needed for mail) |
+| **Mail** | self-hosted (Plesk + Roundcube). 4 inboxes + forwarders — see [`deploy/mail-map.md`](deploy/mail-map.md). Both domains mail-enabled. |
 | **Registrar** | Name.com |
 | **Authoritative DNS** | Cloudflare (Free plan) |
 | **Primary domain** | `cianomalley.works` (portfolio) |

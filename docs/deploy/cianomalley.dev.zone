@@ -1,15 +1,17 @@
 ;; ===========================================================================
 ;; Cloudflare DNS zone  —  cianomalley.dev   (PLACEHOLDER copy for the repo)
 ;; ---------------------------------------------------------------------------
-;; Import:  Cloudflare dashboard > cianomalley.dev > DNS > Records > Import
+;; Import:  Cloudflare > cianomalley.dev > DNS > Records > Import
 ;;
 ;; BEFORE importing: replace <IPv4>/<IPv6>. Delete AAAA if IPv6 isn't verified.
-;; AFTER importing:
-;;   @ and www -> DNS only (grey) until Let's Encrypt is issued, then Proxied.
-;;   SSL/TLS > Overview -> Full (strict).
+;; AFTER importing — proxy status:
+;;   @, www  -> DNS only (grey) until Let's Encrypt is issued, then Proxied.
+;;   demo subdomains -> Proxied after each gets its SSL cert.
+;;   Then SSL/TLS > Overview -> Full (strict).
 ;;
-;; Demos: add ONE CNAME per project demo (no wildcard initially). Proxy them
-;;        (orange) only after their subdomain has an SSL cert in Plesk.
+;; Mail: .dev also handles mail (it receives the .dev forwarders), so it carries
+;; MX/SPF/DMARC + a DKIM record. Mail routes through server.cianomalley.works.
+;; DKIM: run plesk-setup.sh; paste the .dev default._domainkey TXT it prints.
 ;; ===========================================================================
 
 $TTL 300
@@ -17,6 +19,12 @@ $TTL 300
 @               IN  A       <IPv4>
 @               IN  AAAA    <IPv6>
 www             IN  CNAME   cianomalley.dev.
+
+;; --- mail (forwarders receive here, then redirect to *.works inboxes) ---
+@               IN  MX  10  server.cianomalley.works.
+@               IN  TXT     "v=spf1 a:server.cianomalley.works mx ip4:<IPv4> ip6:<IPv6> ~all"
+_dmarc          IN  TXT     "v=DMARC1; p=none; rua=mailto:dmarc@cianomalley.dev; adkim=s; aspf=s; pct=100"
+;; default._domainkey  IN  TXT  "v=DKIM1; k=rsa; p=..."   <- paste from plesk-setup.sh (.dev)
 
 ;; --- project demos (uncomment / duplicate as you publish each one) ---
 ;; portfolio-demo  IN  CNAME  cianomalley.dev.
