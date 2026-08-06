@@ -97,6 +97,42 @@ The one-line text on the card comes from the **Excerpt**. Right sidebar →
 
 ---
 
+## Photos, diagrams and videos
+
+You can put images, diagrams and videos anywhere in a project or blog post's body.
+Everything is styled to sit neatly inside the reading column and scale down on
+phones automatically — you don't set any sizes.
+
+### Photos & diagrams
+- In the editor, click **＋** → **Image** → **Upload**, or just **drag the file**
+  into the editor. It's stored in your **Media Library**.
+- Add a **caption** in the small text line under the image if you want one.
+- **Diagrams** are just images — export your diagram as **PNG or JPG** and upload
+  it the same way. A screenshot works too.
+- **SVG diagrams:** WordPress blocks SVG uploads by default (a safety measure). If
+  you want crisp vector diagrams, either **export them to PNG**, or install the free
+  **“Safe SVG”** plugin (Plugins → Add New) which sanitises and allows SVGs.
+- Want several photos together? Use the **Gallery** block (**＋** → Gallery) — it
+  lays them out in a responsive grid.
+
+### Videos
+Two ways, both fully responsive (16:9):
+
+1. **YouTube / Vimeo (recommended):** click **＋** → **YouTube** (or **Video →
+   Embed**), paste the video URL, press Enter. It becomes a responsive player.
+   *(On first paste WordPress fetches the preview from the provider, so the server
+   needs outbound internet — normal on any Plesk host.)*
+2. **Your own video file:** **＋** → **Video** → **Upload** an `.mp4`. It gets
+   native playback controls. Keep self-hosted files small (large videos eat disk and
+   bandwidth) — for anything long, YouTube/Vimeo is the better choice.
+
+### The featured image vs. body images
+- The **Featured image** (right sidebar) is the card thumbnail and the big cover at
+  the top of the page — set one per project/post for the best look.
+- **Body images/videos** are the ones you place inside the writing, as above.
+
+---
+
 ## The Details box, field by field
 
 Every type except the blog has a small **Details** box (right-hand side). Only the

@@ -309,6 +309,21 @@ body.has-cursor a, body.has-cursor button { cursor: none; }
 .entry-content blockquote { border-left: 2px solid var(--acid); margin: var(--s5) 0; padding-left: var(--s5); color: var(--silver); }
 .gallery-grid { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-block: var(--s6); }
 .gallery-grid img { border: var(--border-hair); }
+
+/* ---- Media in content: photos, diagrams (PNG/JPG/GIF/SVG), video & embeds ---- */
+/* Figures — the block editor wraps images/embeds/video in <figure>. */
+.entry-content figure { margin-block: var(--s5); max-width: 100%; }
+.entry-content figure img { margin-block: 0; }             /* the figure owns the spacing */
+.entry-content :where(img, video, iframe) { max-width: 100%; }
+/* Self-hosted video (the Video block or a raw <video>). */
+.entry-content video, .entry-content .wp-block-video video { width: 100%; height: auto; display: block; border: var(--border-hair); background: var(--void); }
+/* Embedded video (YouTube / Vimeo via the Embed block) — responsive 16:9. */
+.entry-content iframe { border: 0; }
+.entry-content .wp-block-embed.is-type-video iframe { width: 100%; aspect-ratio: 16 / 9; height: auto; }
+.entry-content .wp-block-embed { margin-block: var(--s5); }
+/* Captions under any figure (photo, diagram, video, embed). */
+.entry-content figcaption { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); margin-top: var(--s2); text-align: center; }
+
 .post-nav { display: flex; justify-content: space-between; gap: var(--s4); margin-top: var(--s9); border-top: var(--border-hair); padding-top: var(--s5); font-family: var(--font-mono); font-size: 0.82rem; }
 
 /* ---- Contact form ---- */
