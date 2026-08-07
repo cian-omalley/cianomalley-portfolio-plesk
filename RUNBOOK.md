@@ -15,14 +15,15 @@ mail + demos." It says exactly what to do, what's already done, and what's left.
 | Done ✅ | Still to do ⏳ |
 |---|---|
 | IONOS firewall `fw-cian-prod-web-01` (ports 22/80/443/8443/25/587/465/993) | Reverse DNS (PTR) for both IPs |
-| VPS + Plesk installed (Debian 13.6, Obsidian 18.0.80) | Nameservers → Cloudflare (at Name.com) |
-| IPs assigned & active | Run `plesk-setup.sh` (mail, forwarders, DKIM) |
-| Theme built + all deploy files prepared | Import DNS zones into Cloudflare |
-| Mail scheme designed (4 inboxes + forwarders) | Issue Let's Encrypt certs |
-| Demo pages built (SafePulse, Hermes, Captain Claw) | Set Cloudflare proxy + Full (strict) |
-| | Install WordPress + activate theme |
-| | Publish content (drafts) |
-| | Host the 3 demos on `.dev` subdomains |
+| VPS + Plesk installed (Debian 13.6, Obsidian 18.0.80) | Confirm nameservers → Cloudflare (at Name.com) |
+| IPs assigned & active | Confirm DNS zones fully imported into Cloudflare |
+| `plesk-setup.sh` run: hostname set, both domains created | Issue Let's Encrypt certs |
+| **4 mailboxes created** (`cian@`, `hello@`, `admin@`, `website@`) | Set Cloudflare proxy + Full (strict) |
+| **All 27 forwarders created** (see `mail-map.md`) | Install WordPress + activate theme |
+| **DKIM enabled on both domains** — both public keys captured | Add the 2 DKIM TXT records in Cloudflare |
+| Theme built + all deploy files prepared | Publish content (drafts) |
+| Maintenance mode built into the theme | Host the 3 demos on `.dev` subdomains |
+| Demo pages built (SafePulse, Hermes, Captain Claw) | Harden (SSH key, restrict ports, 2FA, backups) |
 
 ---
 
@@ -49,20 +50,35 @@ trust you. (The firewall is already done.)
 5. Wait until Cloudflare shows each domain **Active** (minutes–hours; it emails you).
    Re-enable **DNSSEC in Cloudflare** only after it's active.
 
-## 3. SSH in and run the setup script  ⏳
+## 3. SSH in and run the setup script  ✅ done
 1. `ssh root@212.227.29.230`
-2. Open `plesk-setup.sh`, set the **4 mailbox passwords** (`PW_CIAN`, `PW_HELLO`,
-   `PW_ADMIN`, `PW_WEBSITE`). Confirm `IPV6` with `ip -6 addr show` (usually `…::1`).
-3. Upload it (Termius/SFTP) or paste it into `nano plesk-setup.sh`, then:
-   ```
-   bash plesk-setup.sh
-   ```
-4. It: sets the hostname, creates both domains, makes the **4 inboxes**, creates all
-   **forwarders** (see `mail-map.md`), enables **DKIM**, and **prints two DKIM
-   records** — copy both. Any step that can't run prints a `!!` line with the UI path.
+2. `plesk-setup.sh` had the **4 mailbox passwords** set (`PW_CIAN`, `PW_HELLO`,
+   `PW_ADMIN`, `PW_WEBSITE`) and `IPV6` confirmed with `ip -6 addr show`.
+3. Ran with `bash plesk-setup.sh`.
+4. Result: hostname set, both domains created, **4 inboxes created**, **all 27
+   forwarders created** (see `mail-map.md`), **DKIM enabled on both domains**.
 
-> If a `!!` line appears (Plesk CLI flags vary by build), tell me the exact line and
-> I'll give you the precise Obsidian 18.0.80 command or UI click.
+> **Plesk Obsidian 18.0.80 quirk found along the way:** `-forwarding-addresses`
+> requires a `set:` prefix (e.g. `set:hello@cianomalley.works`), not a bare
+> address — `plesk-setup.sh` already has this fix baked in. If you ever re-run
+> an older copy and see forwarder errors, that's why.
+
+**Get the two DKIM records** (needed for §4) — the script's own DNS lookup
+doesn't work since Plesk's local DNS service isn't installed (expected — Cloudflare
+is authoritative). Pull the key straight from the signing key file instead:
+```sh
+for D in cianomalley.works cianomalley.dev; do
+  echo "== $D =="
+  if [ -f /etc/domainkeys/$D/default.txt ]; then
+    cat /etc/domainkeys/$D/default.txt
+  elif openssl rsa -in /etc/domainkeys/$D/default -pubout >/tmp/pk 2>/dev/null; then
+    printf 'v=DKIM1; k=rsa; p='; grep -v -- '-----' /tmp/pk | tr -d '\n'; echo
+  else
+    echo "not found — listing:"; ls -la /etc/domainkeys/$D 2>&1
+  fi
+done; rm -f /tmp/pk
+```
+Each prints a `v=DKIM1; k=rsa; p=…` line — copy both for the next step.
 
 ## 4. Cloudflare — import DNS + add DKIM  ⏳
 For **each** domain: Cloudflare → the domain → **DNS → Records → Import** → upload the
@@ -101,6 +117,19 @@ SSL/TLS) and assign it to **Plesk** + **Mail server** — then use
 Everything seeds as **drafts**. In wp-admin, open **Projects / Client Work / Guides /
 Reviews / Posts**, review each, and **Publish** the ones you want live. Clone the
 `TEMPLATE —` drafts to add new items. Full guide: `AUTHORING.md`.
+
+## 8b. Maintenance mode (optional, any time)  ✅ built-in
+The theme ships an on-brand maintenance page. Toggle it any time from
+**wp-admin → Settings → Maintenance Mode**: a checkbox, an editable message, and
+a contact email.
+- Visitors get a "Back Soon" page with a proper **HTTP 503 + Retry-After** (so
+  search engines check back instead of dropping the site), styled to match the
+  rest of the site (neon gradient title, status pill, mailto link).
+- **You (logged in as admin) always see the real site** — wp-admin and the login
+  page are never gated, so you can never lock yourself out.
+- An admin-bar warning shows whenever it's left switched on.
+- Useful for: the initial go-live window while you're still publishing content,
+  or any time you want to work on the site without visitors seeing a half-done page.
 
 ## 9. The demos on `.dev`  ⏳
 Three standalone demo pages are in **`demos/`**: `safepulse/`, `hermes/`, `captain-claw/`.
@@ -149,16 +178,16 @@ button appears.
 | `/projects/` 404s | Re-save **Settings → Permalinks**. |
 | A `plesk bin` step failed (`!!`) | Do it in the UI (path shown), or send me the line. |
 | Fonts/theme look plain | Ensure the full `digital-district.zip` uploaded (fonts are inside it). |
+| Site looks "under construction" unexpectedly | Settings → Maintenance Mode is switched on — uncheck it. |
 
 ## What's still to do (short list)
-1. PTR (both IPs) in IONOS.
-2. Nameservers → Cloudflare at Name.com.
-3. Run `plesk-setup.sh` (set passwords first).
-4. Import DNS zones + DKIM into Cloudflare.
-5. Issue Let's Encrypt, then proxy + Full (strict).
-6. Install WordPress + activate theme + permalinks + Sync GitHub.
-7. Publish the drafts you want.
-8. Host the 3 demos on `.dev` subdomains.
-9. Harden (SSH key, restrict ports, 2FA, backups).
+1. PTR (both IPs) in IONOS — still shows `--` as of the last check.
+2. Confirm nameservers → Cloudflare at Name.com, and that both zones are fully imported.
+3. Add the 2 DKIM TXT records into Cloudflare (values captured in §3).
+4. Issue Let's Encrypt, then proxy + Full (strict).
+5. Install WordPress + activate theme + permalinks + Sync GitHub.
+6. Publish the drafts you want (optionally flip on Maintenance Mode while you work).
+7. Host the 3 demos on `.dev` subdomains.
+8. Harden (SSH key, restrict ports, 2FA, backups).
 
 Send me a screenshot at any step and I'll walk you through that exact screen.

@@ -13,20 +13,24 @@ Cloudflare stack. Read **`RUNBOOK.md`** for the full step-by-step; this is the
 | **AUTHORING.md** | How to add projects / blogs / media after launch |
 | **plesk-setup.sh** | Run on the VPS over SSH (mailboxes, forwarders, DKIM) |
 | **cianomalley.works.zone** / **cianomalley.dev.zone** | Import into Cloudflare |
-| **digital-district.zip** | The theme — upload to WordPress |
+| **digital-district.zip** | The theme — upload to WordPress. Includes built-in Maintenance Mode (Settings → Maintenance Mode once installed) |
 | **demos/** | Standalone demo pages for SafePulse, Hermes, Captain Claw |
 
 ## The order (one line each)
-1. **IONOS** — set reverse DNS (PTR) for both IPs → `server.cianomalley.works`.
-2. **Cloudflare + Name.com** — add domains to Cloudflare, point Name.com nameservers at it.
-3. **SSH** — `bash plesk-setup.sh` (creates mail, prints DKIM records).
-4. **Cloudflare** — import both zone files + the 2 DKIM records; proxy grey for now.
-5. **Plesk** — issue Let's Encrypt (command printed by the script).
-6. **Cloudflare** — flip `@`/`www` to orange, SSL → Full (strict).
-7. **WordPress** — install, upload `digital-district.zip`, activate, permalinks, Sync GitHub.
-8. **Content** — publish the drafts you want (see AUTHORING.md).
-9. **Demos** — create the `.dev` subdomains and upload the `demos/` pages.
+1. ✅ **IONOS firewall** — done.
+2. ✅ **SSH + `plesk-setup.sh`** — done: hostname, both domains, 4 mailboxes, all 27
+   forwarders, DKIM enabled on both domains (keys captured).
+3. ⏳ **IONOS** — set reverse DNS (PTR) for both IPs → `server.cianomalley.works`.
+4. ⏳ **Cloudflare + Name.com** — confirm domains are on Cloudflare and nameservers
+   at Name.com point at it.
+5. ⏳ **Cloudflare** — finish importing both zone files + add the 2 DKIM TXT
+   records; proxy grey for now.
+6. ⏳ **Plesk** — issue Let's Encrypt (command printed by the script).
+7. ⏳ **Cloudflare** — flip `@`/`www` to orange, SSL → Full (strict).
+8. ⏳ **WordPress** — install, upload `digital-district.zip`, activate, permalinks, Sync GitHub.
+9. ⏳ **Content** — publish the drafts you want (see AUTHORING.md); optionally flip on
+   **Settings → Maintenance Mode** while you work.
+10. ⏳ **Demos** — create the `.dev` subdomains and upload the `demos/` pages.
 
-## The 2 things only you can do
-- Set the **4 mailbox passwords** in `plesk-setup.sh`.
-- Set **reverse DNS (PTR)** in IONOS for both IPs (mail won't send otherwise).
+## The 1 thing only you can still do
+- Set **reverse DNS (PTR)** in IONOS for both IPs (mail won't send outbound otherwise).
